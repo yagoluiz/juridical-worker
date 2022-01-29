@@ -1,9 +1,9 @@
-using Juridical.Worker;
+using Juridical.Worker.Workers;
 
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices(services =>
     {
-        services.AddHostedService<Worker>();
+        services.AddHostedService<LegalProcessWorker>();
     })
     .Build();
 
