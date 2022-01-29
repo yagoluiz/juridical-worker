@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  selenium-hub:
+    container_name: selenium-hub
+    image: selenium/standalone-chrome:4.1.1-20220121
+    ports:
+      - "4444:4444"
+    expose:
+      - 4444
+    networks:
+      - worker-network
+  
+  juridical-worker:
+    container_name: juridical-worker
+    image: juridical-worker
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - worker-network
+    depends_on:
+      - selenium-hub
+    restart: on-failure
+
+networks:
+  worker-network:
+    name: worker-network
+    driver: bridge
