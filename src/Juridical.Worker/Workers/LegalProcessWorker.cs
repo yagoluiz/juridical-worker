@@ -22,21 +22,21 @@ public class LegalProcessWorker : BackgroundService
             _logger.LogInformation("LegalProcessWorker running at: {time}", DateTimeOffset.Now);
 
             var webDriver = new RemoteWebDriver(
-                new Uri(_configuration.GetValue<string>("WebDriver:Uri")),
+                new Uri(_configuration.GetValue<string>("WEB_DRIVER_URI")),
                 new ChromeOptions()
             );
 
             try
             {
-                webDriver.Navigate().GoToUrl(_configuration.GetValue<string>("LegalProcess:Url"));
+                webDriver.Navigate().GoToUrl(_configuration.GetValue<string>("LEGAL_PROCESS_URL"));
 
-                webDriver.FindElementById("login").SendKeys(_configuration.GetValue<string>("LegalProcess:User"));
-                webDriver.FindElementById("senha").SendKeys(_configuration.GetValue<string>("LegalProcess:Password"));
+                webDriver.FindElementById("login").SendKeys(_configuration.GetValue<string>("LEGAL_PROCESS_USER"));
+                webDriver.FindElementById("senha").SendKeys(_configuration.GetValue<string>("LEGAL_PROCESS_PASSWORD"));
                 webDriver.FindElementByName("entrar").Click();
 
                 webDriver
                     .FindElementByXPath(
-                        $"//*[contains(text(),'{_configuration.GetValue<string>("LegalProcess:ServiceKey")}')]")
+                        $"//*[contains(text(),'{_configuration.GetValue<string>("LEGAL_PROCESS_SERVICE_KEY")}')]")
                     .Click();
 
                 webDriver.SwitchTo().Frame(webDriver.FindElement(By.Name("userMainFrame")));
@@ -83,7 +83,7 @@ public class LegalProcessWorker : BackgroundService
 
             _logger.LogInformation("LegalProcessWorker running finish at: {time}", DateTimeOffset.Now);
 
-            await Task.Delay(_configuration.GetValue<int>("LegalProcess:ExecuteInMilliseconds"), stoppingToken);
+            await Task.Delay(_configuration.GetValue<int>("LEGAL_PROCESS_EXECUTE_IN_MILLISECONDS"), stoppingToken);
         }
     }
 }
