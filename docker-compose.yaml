@@ -10,6 +10,7 @@ services:
       - 4444
     networks:
       - worker-network
+    restart: always
   
   juridical-worker:
     container_name: juridical-worker
@@ -17,11 +18,17 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      - DOTNET_ENVIRONMENT=Production
+      - LEGAL_PROCESS_USER
+      - LEGAL_PROCESS_PASSWORD
     networks:
       - worker-network
     depends_on:
       - selenium-hub
-    restart: on-failure
+    restart: always
 
 networks:
   worker-network:
