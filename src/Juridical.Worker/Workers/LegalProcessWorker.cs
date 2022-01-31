@@ -1,3 +1,4 @@
+using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Remote;
 
@@ -27,7 +28,48 @@ public class LegalProcessWorker : BackgroundService
 
             try
             {
-                webDriver.Navigate().GoToUrl("https://www.google.com");
+                webDriver.Navigate().GoToUrl(_configuration.GetValue<string>("LegalProcess:Url"));
+
+                webDriver.FindElementById("login").SendKeys(_configuration.GetValue<string>("LegalProcess:User"));
+                webDriver.FindElementById("senha").SendKeys(_configuration.GetValue<string>("LegalProcess:Password"));
+                webDriver.FindElementByName("entrar").Click();
+
+                webDriver
+                    .FindElementByXPath(
+                        $"//*[contains(text(),'{_configuration.GetValue<string>("LegalProcess:ServiceKey")}')]")
+                    .Click();
+
+                webDriver.SwitchTo().Frame(webDriver.FindElement(By.Name("userMainFrame")));
+
+                var processes = 0;
+
+                var table = webDriver.FindElementByTagName("table");
+                var tableBody = table.FindElement(By.TagName("tbody"));
+
+                var tableRows = tableBody.FindElements(By.TagName("tr"));
+
+                foreach (var tableRow in tableRows)
+                {
+                    if (processes > 0) break;
+                    
+                    var contentRows = tableRow.FindElements(By.TagName("td"));
+
+                    foreach (var contentRow in contentRows)
+                    {
+                        var attributeRow = contentRow.GetAttribute("class");
+
+                        if (attributeRow != "colunaMinima") continue;
+
+                        var content = tableRow.FindElement(By.TagName("a")).Text;
+
+                        if (content is null) continue;
+
+                        processes = int.Parse(content);
+                        break;
+                    }
+                }
+
+                _logger.LogInformation($"LegalProcessWorker processes count: {processes}");
             }
             catch (Exception exception)
             {
@@ -41,7 +83,7 @@ public class LegalProcessWorker : BackgroundService
 
             _logger.LogInformation("LegalProcessWorker running finish at: {time}", DateTimeOffset.Now);
 
-            await Task.Delay(1000, stoppingToken);
+            await Task.Delay(_configuration.GetValue<int>("LegalProcess:ExecuteInMilliseconds"), stoppingToken);
         }
     }
 }
