@@ -1,3 +1,6 @@
+using Juridical.Worker.Interfaces;
+using Juridical.Worker.Models.Requests;
+using Juridical.Worker.Models.Responses;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Remote;
@@ -6,11 +9,16 @@ namespace Juridical.Worker.Workers;
 
 public class LegalProcessWorker : BackgroundService
 {
+    private readonly IMessageService _messageService;
     private readonly IConfiguration _configuration;
     private readonly ILogger<LegalProcessWorker> _logger;
 
-    public LegalProcessWorker(IConfiguration configuration, ILogger<LegalProcessWorker> logger)
+    public LegalProcessWorker(
+        IMessageService messageService,
+        IConfiguration configuration,
+        ILogger<LegalProcessWorker> logger)
     {
+        _messageService = messageService;
         _configuration = configuration;
         _logger = logger;
     }
@@ -22,9 +30,7 @@ public class LegalProcessWorker : BackgroundService
             _logger.LogInformation("LegalProcessWorker running at: {time}", DateTimeOffset.Now);
 
             var webDriver = new RemoteWebDriver(
-                new Uri(_configuration.GetValue<string>("WEB_DRIVER_URI")),
-                new ChromeOptions()
-            );
+                new Uri(_configuration.GetValue<string>("WEB_DRIVER_URI")), new ChromeOptions());
 
             try
             {
@@ -41,7 +47,7 @@ public class LegalProcessWorker : BackgroundService
 
                 webDriver.SwitchTo().Frame(webDriver.FindElement(By.Name("userMainFrame")));
 
-                var processes = 0;
+                var processesCount = 0;
 
                 var table = webDriver.FindElementByTagName("table");
                 var tableBody = table.FindElement(By.TagName("tbody"));
@@ -50,8 +56,8 @@ public class LegalProcessWorker : BackgroundService
 
                 foreach (var tableRow in tableRows)
                 {
-                    if (processes > 0) break;
-                    
+                    if (processesCount > 0) break;
+
                     var contentRows = tableRow.FindElements(By.TagName("td"));
 
                     foreach (var contentRow in contentRows)
@@ -64,12 +70,32 @@ public class LegalProcessWorker : BackgroundService
 
                         if (content is null) continue;
 
-                        processes = int.Parse(content);
+                        processesCount = int.Parse(content);
                         break;
                     }
                 }
 
-                _logger.LogInformation($"LegalProcessWorker processes count: {processes}");
+                _logger.LogInformation($"LegalProcessWorker processes count: {processesCount}");
+
+                if (_configuration.GetValue<bool>("MESSAGE_SERVICE_ACTIVE"))
+                {
+                    var message = await _messageService.SendAsync(new MessageRequest(
+                        _configuration.GetValue<string>("MESSAGE_SERVICE_FROM"),
+                        _configuration.GetValue<string>("MESSAGE_SERVICE_TO"),
+                        new List<MessageContentRequest>
+                        {
+                            new($"Atenção! Você tem um total de {processesCount} processo(s) não analisado(s). Acesse https://bit.ly/3gtEHEB para mais informações.")
+                        }));
+
+                    if (message.Success)
+                    {
+                        _logger.LogInformation($"LegalProcessWorker send success message: {(message.Content as MessageResponse)?.Id}");
+                    }
+                    else
+                    {
+                        _logger.LogCritical($"LegalProcessWorker send error message: {message.Content}");
+                    }
+                }
             }
             catch (Exception exception)
             {

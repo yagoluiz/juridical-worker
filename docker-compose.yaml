@@ -24,6 +24,9 @@ services:
       - DOTNET_ENVIRONMENT=Production
       - LEGAL_PROCESS_USER
       - LEGAL_PROCESS_PASSWORD
+      - MESSAGE_SERVICE_API_TOKEN
+      - MESSAGE_SERVICE_TO
+      - MESSAGE_SERVICE_FROM
     networks:
       - worker-network
     depends_on:
