@@ -12,6 +12,7 @@ var host = Host.CreateDefaultBuilder(args)
             client.DefaultRequestHeaders.Add("x-api-token",
                 context.Configuration.GetValue<string>("MESSAGE_SERVICE_API_TOKEN"));
         });
+        services.AddMemoryCache();
     })
     .Build();
 

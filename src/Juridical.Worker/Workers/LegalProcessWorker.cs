@@ -1,6 +1,8 @@
 using Juridical.Worker.Interfaces;
 using Juridical.Worker.Models.Requests;
 using Juridical.Worker.Models.Responses;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Primitives;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Remote;
@@ -10,15 +12,20 @@ namespace Juridical.Worker.Workers;
 public class LegalProcessWorker : BackgroundService
 {
     private readonly IMessageService _messageService;
+    private readonly IMemoryCache _memoryCache;
     private readonly IConfiguration _configuration;
     private readonly ILogger<LegalProcessWorker> _logger;
 
+    private const string CacheKey = "ProcessKey";
+
     public LegalProcessWorker(
         IMessageService messageService,
+        IMemoryCache memoryCache,
         IConfiguration configuration,
         ILogger<LegalProcessWorker> logger)
     {
         _messageService = messageService;
+        _memoryCache = memoryCache;
         _configuration = configuration;
         _logger = logger;
     }
@@ -47,7 +54,7 @@ public class LegalProcessWorker : BackgroundService
 
                 webDriver.SwitchTo().Frame(webDriver.FindElement(By.Name("userMainFrame")));
 
-                var processesCount = 0;
+                var processCount = 0;
 
                 var table = webDriver.FindElementByTagName("table");
                 var tableBody = table.FindElement(By.TagName("tbody"));
@@ -56,7 +63,7 @@ public class LegalProcessWorker : BackgroundService
 
                 foreach (var tableRow in tableRows)
                 {
-                    if (processesCount > 0) break;
+                    if (processCount > 0) break;
 
                     var contentRows = tableRow.FindElements(By.TagName("td"));
 
@@ -70,30 +77,48 @@ public class LegalProcessWorker : BackgroundService
 
                         if (content is null) continue;
 
-                        processesCount = int.Parse(content);
+                        processCount = int.Parse(content);
                         break;
                     }
                 }
 
-                _logger.LogInformation($"LegalProcessWorker processes count: {processesCount}");
+                _logger.LogInformation($"LegalProcessWorker process count: {processCount}");
 
-                if (_configuration.GetValue<bool>("MESSAGE_SERVICE_ACTIVE"))
+                if (_configuration.GetValue<bool>("MESSAGE_SERVICE_ACTIVE") && processCount > 0)
                 {
-                    var message = await _messageService.SendAsync(new MessageRequest(
-                        _configuration.GetValue<string>("MESSAGE_SERVICE_FROM"),
-                        _configuration.GetValue<string>("MESSAGE_SERVICE_TO"),
-                        new List<MessageContentRequest>
-                        {
-                            new($"Atenção! Você tem um total de {processesCount} processo(s) não analisado(s). Acesse https://bit.ly/3gtEHEB para mais informações.")
-                        }));
+                    _logger.LogInformation("LegalProcessWorker MESSAGE_SERVICE_ACTIVE activated");
 
-                    if (message.Success)
+                    var cachedProcessCount = await _memoryCache.GetOrCreateAsync(
+                        CacheKey, 
+                        cacheEntry =>
+                        {
+                            cacheEntry.AddExpirationToken(new CancellationChangeToken(stoppingToken));
+                            return Task.FromResult(processCount);
+                        });
+
+                    _logger.LogInformation($"LegalProcessWorker cached process count: {cachedProcessCount}");
+
+                    if (cachedProcessCount == 1 || cachedProcessCount != processCount)
                     {
-                        _logger.LogInformation($"LegalProcessWorker send success message: {(message.Content as MessageResponse)?.Id}");
-                    }
-                    else
-                    {
-                        _logger.LogCritical($"LegalProcessWorker send error message: {message.Content}");
+                        var message = await _messageService.SendAsync(new MessageRequest(
+                            _configuration.GetValue<string>("MESSAGE_SERVICE_FROM"), 
+                            _configuration.GetValue<string>("MESSAGE_SERVICE_TO"), 
+                            new List<MessageContentRequest>
+                            {
+                                new($"Atenção! Você tem um total de {processCount} processo(s) não analisado(s). Acesse https://bit.ly/3gtEHEB para mais informações.")
+                            }));
+
+                        if (message.Success)
+                        {
+                            _logger.LogInformation($"LegalProcessWorker send success message: {(message.Content as MessageResponse)?.Id}");
+
+                            _memoryCache.Set(CacheKey, processCount, new MemoryCacheEntryOptions()
+                                .AddExpirationToken(new CancellationChangeToken(stoppingToken)));
+                        }
+                        else
+                        {
+                            _logger.LogCritical($"LegalProcessWorker send error message: {message.Content}");
+                        }
                     }
                 }
             }
