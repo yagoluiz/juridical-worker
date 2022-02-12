@@ -14,7 +14,7 @@ public class LegalProcessWorker : BackgroundService
     private readonly IConfiguration _configuration;
     private readonly ILogger<LegalProcessWorker> _logger;
 
-    private const string CacheKey = "ProcessKey";
+    private const string CacheKey = "LegalProcessKey";
 
     public LegalProcessWorker(
         IMessageService messageService,
