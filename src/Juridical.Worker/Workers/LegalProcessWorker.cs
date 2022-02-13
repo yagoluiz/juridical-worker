@@ -52,7 +52,7 @@ public class LegalProcessWorker : BackgroundService
                 _logger.LogInformation($"LegalProcessWorker process count: {processCount}");
                 _logger.LogInformation($"LegalProcessWorker MESSAGE_SERVICE_ACTIVE: {messageServiceActive}");
 
-                if (messageServiceActive && processCount > 0) await ProcessCountAsync(processCount, stoppingToken);
+                if (messageServiceActive) await ProcessCountAsync(processCount, stoppingToken);
             }
             catch (Exception exception)
             {
@@ -73,13 +73,13 @@ public class LegalProcessWorker : BackgroundService
             cacheEntry =>
             {
                 cacheEntry.AddExpirationToken(new CancellationChangeToken(stoppingToken));
-                return Task.FromResult(processCount);
+                return Task.FromResult(0);
             });
 
         _logger.LogInformation($"LegalProcessWorker cached process count: {cachedProcessCount}");
         _logger.LogInformation($"LegalProcessWorker process count: {processCount}");
 
-        var sendMessage = cachedProcessCount == 1 || cachedProcessCount != processCount;
+        var sendMessage = cachedProcessCount != processCount;
 
         _logger.LogInformation($"LegalProcessWorker process count send message: {sendMessage}");
 
