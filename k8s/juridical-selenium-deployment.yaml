@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: juridical-selenium
+  namespace: juridical
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: juridical-selenium
+    spec:
+      containers:
+        - name: juridical-selenium
+          image: selenium/standalone-chrome:4.1.1-20220121
+          ports:
+            - containerPort: 4444
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: juridical-selenium
