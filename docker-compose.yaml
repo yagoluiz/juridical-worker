@@ -1,8 +1,8 @@
 version: "3.9"
 
 services:
-  selenium-hub:
-    container_name: selenium-hub
+  juridical-selenium:
+    container_name: juridical-selenium
     image: selenium/standalone-chrome:4.1.1-20220121
     ports:
       - "4444:4444"
@@ -30,7 +30,7 @@ services:
     networks:
       - worker-network
     depends_on:
-      - selenium-hub
+      - juridical-selenium
     restart: always
 
 networks:
