@@ -360,5 +360,5 @@ MigrationBackup/
 !.vscode/launch.json
 !.vscode/extensions.json
 
-# Docker local env
+# Local env
 .env
