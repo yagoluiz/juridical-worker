@@ -1,6 +1,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - k8s/namespaces/juridical-selenium-deployment.yaml
-  - k8s/namespaces/juridical-worker-deployment.yaml
-  - k8s/namespaces/juridical-selenium-service.yaml
+  - k8s/deployments/juridical-selenium-deployment.yaml
+  - k8s/deployments/juridical-worker-deployment.yaml
+  - k8s/services/juridical-selenium-service.yaml
