@@ -41,13 +41,13 @@ jobs:
         run: |-
           gcloud --quiet auth configure-docker
 
-      - name: Build
+      - name: Docker build
         run: |-
           docker build \
             --tag "gcr.io/$PROJECT_ID/$GCR_IMAGE:$GITHUB_SHA" \
             --tag "gcr.io/$PROJECT_ID/$GCR_IMAGE:latest" \
             .
 
-      - name: Publish
+      - name: Docker publish
         run: |-
           docker push --all-tags "gcr.io/$PROJECT_ID/$GCR_IMAGE"
