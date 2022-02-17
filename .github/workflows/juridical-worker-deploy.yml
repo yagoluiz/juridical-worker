@@ -95,8 +95,7 @@ jobs:
           cluster_name: ${{ env.GKE_CLUSTER }}
           location: ${{ env.GKE_ZONE }}
 
-      - id: "get-pods"
-        name: Create juridical namespace
+      - name: Create juridical namespace
         run: |-
           kubectl apply -f k8s/namespaces/juridical-namespace.yaml
 
