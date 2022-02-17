@@ -121,6 +121,5 @@ jobs:
         run: |-
           ./kustomize edit set image gcr.io/PROJECT_ID/IMAGE:TAG=gcr.io/$PROJECT_ID/$GCR_IMAGE:$GITHUB_SHA
           ./kustomize build . | kubectl apply -f -
-          kubectl rollout status k8s/deployments/juridical-selenium-deployment
-          kubectl rollout status k8s/deployments/juridical-worker-deployment
-          kubectl get services -o wide
+          kubectl rollout status -n ${{ env.K8S_NAMESPACE }}
+          kubectl get services -n ${{ env.K8S_NAMESPACE }} -o wide
