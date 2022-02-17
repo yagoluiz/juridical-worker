@@ -21,42 +21,42 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: 'read'
-      id-token: 'write'
+      contents: "read"
+      id-token: "write"
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
-    - id: 'auth'
-      name: 'Authenticate to Google Cloud'
-      uses: 'google-github-actions/auth@v0'
-      with:
-        workload_identity_provider: '$WORKLOAD_IDENTITY_PROVIDER'
-        service_account: '$SERVICE_ACCOUNT'
+      - id: "auth"
+        name: "Authenticate to Google Cloud"
+        uses: "google-github-actions/auth@v0"
+        with:
+          workload_identity_provider: $WORKLOAD_IDENTITY_PROVIDER
+          service_account: $SERVICE_ACCOUNT
 
-    - name: Set up Cloud SDK
-      uses: google-github-actions/setup-gcloud@v0
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
 
-    - name: 'Use gcloud CLI'
-      run: 'gcloud info'
+      - name: "Use gcloud CLI"
+        run: "gcloud info"
 
-    - name: Docker configuration
-      run: |-
-        gcloud --quiet auth configure-docker
-        
-    - name: Set up GKE credentials
-      run: |-
-        gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
-  
-    - name: Build
-      run: |-
-        docker build \
-          --tag "gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA" \
-          --build-arg GITHUB_SHA="$GITHUB_SHA" \
-          --build-arg GITHUB_REF="$GITHUB_REF" \
-          .
-          
-    - name: Publish
-      run: |-
-        docker push "gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA"
+      - name: Docker configuration
+        run: |-
+          gcloud --quiet auth configure-docker
+
+      - name: Set up GKE credentials
+        run: |-
+          gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
+
+      - name: Build
+        run: |-
+          docker build \
+            --tag "gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA" \
+            --build-arg GITHUB_SHA="$GITHUB_SHA" \
+            --build-arg GITHUB_REF="$GITHUB_REF" \
+            .
+
+      - name: Publish
+        run: |-
+          docker push "gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA"
