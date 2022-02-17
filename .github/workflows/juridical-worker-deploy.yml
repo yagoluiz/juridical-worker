@@ -50,4 +50,4 @@ jobs:
 
       - name: Publish
         run: |-
-          docker push "gcr.io/$PROJECT_ID/$GCR_IMAGE:$GITHUB_SHA"
+          docker push --all-tags "gcr.io/$PROJECT_ID/$GCR_IMAGE"
