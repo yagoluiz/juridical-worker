@@ -120,7 +120,7 @@ jobs:
 
       - name: Deploy k8s
         run: |-
-          ./kustomize edit set image gcr.io/PROJECT_ID/IMAGE:TAG=gcr.io/$PROJECT_ID/$GCR_IMAGE:$GITHUB_SHA -f k8s/kustomization.yaml
-          ./kustomize build k8s/kustomization.yaml | kubectl apply -f -
+          ./kustomize edit set image gcr.io/PROJECT_ID/IMAGE:TAG=gcr.io/$PROJECT_ID/$GCR_IMAGE:$GITHUB_SHA
+          ./kustomize build . | kubectl apply -f -
           kubectl rollout status deployment/$DEPLOYMENT_NAME
           kubectl get services -o wide
