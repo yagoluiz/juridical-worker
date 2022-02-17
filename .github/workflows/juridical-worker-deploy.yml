@@ -1,6 +1,9 @@
 name: juridical-worker-deploy
 
 on:
+  pull_request:
+    branches:
+      - main
   push:
     branches:
       - main
@@ -8,15 +11,38 @@ on:
   workflow_dispatch:
 
 env:
+  DOTNET_VERSION: 6.0.x
+  WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+  SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
-  GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
-  GKE_ZONE: ${{ secrets.GKE_ZONE }}
-  IMAGE: juridical-worker
+  GCR_IMAGE: juridical-worker
 
 jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore
+
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
+
+    needs: [build]
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' }}
 
     permissions:
       contents: "read"
@@ -30,22 +56,23 @@ jobs:
         name: "Authenticate to Google Cloud"
         uses: "google-github-actions/auth@v0"
         with:
-          workload_identity_provider: "${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}"
-          service_account: "${{ secrets.SERVICE_ACCOUNT }}"
+          workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.SERVICE_ACCOUNT }}
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v0
 
-      - name: "Use gcloud CLI"
-        run: "gcloud info"
+      - name: Docker configuration
+        run: |-
+          gcloud --quiet auth configure-docker
 
-      - name: Build
+      - name: Docker build
         run: |-
           docker build \
-            --tag "gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA" \
-            --tag "gcr.io/$PROJECT_ID/$IMAGE:latest" \
+            --tag "gcr.io/$PROJECT_ID/$GCR_IMAGE:$GITHUB_SHA" \
+            --tag "gcr.io/$PROJECT_ID/$GCR_IMAGE:latest" \
             .
 
       - name: Docker publish
         run: |-
-          docker push "gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA"
+          docker push --all-tags "gcr.io/$PROJECT_ID/$GCR_IMAGE"
