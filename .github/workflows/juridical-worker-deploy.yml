@@ -15,7 +15,6 @@ env:
   GCR_IMAGE: juridical-worker
   K8S_NAMESPACE: juridical
   K8S_JURIDICAL_WORKER_SECRET: juridical-worker-secret
-  DEPLOYMENT_NAME: juridical-worker
 
   WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
   SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
@@ -74,20 +73,20 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v0
 
-      # - name: Docker configuration
-      #   run: |-
-      #     gcloud --quiet auth configure-docker
+      - name: Docker configuration
+        run: |-
+          gcloud --quiet auth configure-docker
 
-      # - name: Docker build
-      #   run: |-
-      #     docker build \
-      #       --tag "gcr.io/$PROJECT_ID/$GCR_IMAGE:$GITHUB_SHA" \
-      #       --tag "gcr.io/$PROJECT_ID/$GCR_IMAGE:latest" \
-      #       .
+      - name: Docker build
+        run: |-
+          docker build \
+            --tag "gcr.io/$PROJECT_ID/$GCR_IMAGE:$GITHUB_SHA" \
+            --tag "gcr.io/$PROJECT_ID/$GCR_IMAGE:latest" \
+            .
 
-      # - name: Docker publish
-      #   run: |-
-      #     docker push --all-tags "gcr.io/$PROJECT_ID/$GCR_IMAGE"
+      - name: Docker publish
+        run: |-
+          docker push --all-tags "gcr.io/$PROJECT_ID/$GCR_IMAGE"
 
       - id: "get-credentials"
         name: Authenticate to GKE
@@ -122,4 +121,3 @@ jobs:
         run: |-
           ./kustomize edit set image gcr.io/PROJECT_ID/IMAGE:TAG=gcr.io/$PROJECT_ID/$GCR_IMAGE:$GITHUB_SHA
           ./kustomize build . | kubectl apply -f -
-          kubectl get services -o wide
