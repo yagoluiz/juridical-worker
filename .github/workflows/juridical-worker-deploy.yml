@@ -96,6 +96,11 @@ jobs:
           location: ${{ env.GKE_ZONE }}
 
       - id: "get-pods"
+        name: Create juridical namespace
+        run: |-
+          kubectl apply -f k8s/namespaces/juridical-namespace.yaml
+
+      - id: "get-pods"
         name: Create k8s secrets
         run: |-
           kubectl create secret generic ${{ env.K8S_JURIDICAL_WORKER_SECRET }} -n ${{ env.K8S_NAMESPACE }} \
