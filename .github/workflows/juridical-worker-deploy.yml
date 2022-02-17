@@ -46,7 +46,6 @@ jobs:
             --tag "gcr.io/$PROJECT_ID/$IMAGE:latest" \
             .
 
-      - name: Docker login and publish
+      - name: Docker publish
         run: |-
-          gcloud --quiet auth configure-docker
           docker push "gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA"
