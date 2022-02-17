@@ -12,6 +12,8 @@ on:
 
 env:
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
+  WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+  SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
   GCR_IMAGE: juridical-worker
 
 jobs:
@@ -31,8 +33,8 @@ jobs:
         name: "Authenticate to Google Cloud"
         uses: "google-github-actions/auth@v0"
         with:
-          workload_identity_provider: "${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}"
-          service_account: "${{ secrets.SERVICE_ACCOUNT }}"
+          workload_identity_provider: "$WORKLOAD_IDENTITY_PROVIDER"
+          service_account: "$SERVICE_ACCOUNT"
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v0
