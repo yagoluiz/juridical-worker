@@ -6,7 +6,7 @@ Worker responsible for identify legal process.
 
 ### .NET
 
-- Use [dotnet user-secrets](https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets):
+- Use [dotnet user-secrets](https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets)
 
 1) Get project folder:
 
@@ -26,7 +26,7 @@ dotnet user-secrets set "MESSAGE_SERVICE_TO" "{YOUR_SECRET}"
 
 ### Docker and Kubernetes
 
-- Create **.env** file:
+- Create **.env** file
 
 ```bash
 LEGAL_PROCESS_USER={YOUR_SECRET}
@@ -54,7 +54,7 @@ src/Juridical.Worker && dotnet watch run
 
 ### Docker
 
-- Run project:
+- Run project
 
 ```bash
 docker-compose up -d
@@ -62,7 +62,7 @@ docker-compose up -d
 
 ### Kubernetes
 
-- Create [Container Registry (GCP)](https://cloud.google.com/container-registry/docs/pushing-and-pulling):
+- Create [Container Registry (GCP)](https://cloud.google.com/container-registry/docs/pushing-and-pulling)
 
 1) Configure auth [GCP CLI](https://cloud.google.com/sdk/gcloud) login:
 
@@ -118,7 +118,7 @@ sh k8s/deploy.sh
 
 ### GitHub Actions
 
-- Create service account from [GCP](https://cloud.google.com/iam/docs/creating-managing-service-accounts):
+- Create service account from [GCP](https://cloud.google.com/iam/docs/creating-managing-service-accounts)
 
 1) Create service account:
 
