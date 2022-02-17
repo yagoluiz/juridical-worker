@@ -15,6 +15,7 @@ env:
   GCR_IMAGE: juridical-worker
   K8S_NAMESPACE: juridical
   K8S_JURIDICAL_WORKER_SECRET: juridical-worker-secret
+  DEPLOYMENT_NAME: juridical-worker
 
   WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
   SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
@@ -99,8 +100,7 @@ jobs:
         run: |-
           kubectl apply -f k8s/namespaces/juridical-namespace.yaml
 
-      - id: "get-pods"
-        name: Create k8s secrets
+      - name: Create k8s secrets
         run: |-
           kubectl create secret generic ${{ env.K8S_JURIDICAL_WORKER_SECRET }} -n ${{ env.K8S_NAMESPACE }} \
             --from-literal=LEGAL_PROCESS_USER='${{ env.K8S_LEGAL_PROCESS_USER }}' \
@@ -108,3 +108,15 @@ jobs:
             --from-literal=MESSAGE_SERVICE_API_TOKEN='${{ env.K8S_MESSAGE_SERVICE_API_TOKEN }}' \
             --from-literal=MESSAGE_SERVICE_FROM='${{ env.K8S_MESSAGE_SERVICE_FROM }}' \
             --from-literal=MESSAGE_SERVICE_TO='${{ env.K8S_MESSAGE_SERVICE_TO }}'
+
+      - name: Set up Kustomize
+        run: |-
+          curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
+          chmod u+x ./kustomize
+
+      - name: Deploy k8s
+        run: |-
+          ./kustomize edit set image gcr.io/PROJECT_ID/IMAGE:TAG=gcr.io/$PROJECT_ID/$GCR_IMAGE:$GITHUB_SHA
+          ./kustomize build k8s/kustomization.yaml | kubectl apply -f -
+          kubectl rollout status deployment/$DEPLOYMENT_NAME
+          kubectl get services -o wide
