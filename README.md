@@ -84,6 +84,16 @@ docker tag juridical/juridical-worker:v1 gcr.io/{PROJECT_ID}/juridical-worker:v1
 docker push gcr.io/{PROJECT_ID}/juridical-worker:v1
 ```
 
+4) Set image worker local deployment:
+
+```yaml
+...
+      containers:
+        - name: juridical-worker
+          image: gcr.io/{PROJECT_ID}/juridical-worker:latest
+...
+```
+
 - Run minikube
 
 1) Start cluster:

@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: juridical-worker
-          image: gcr.io/juridical-340518/juridical-worker:latest
+          image: gcr.io/{PROJECT_ID}/juridical-worker:latest
           env:
             - name: ASPNETCORE_ENVIRONMENT
               value: Production
