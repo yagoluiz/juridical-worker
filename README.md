@@ -150,6 +150,15 @@ gcloud projects add-iam-policy-binding "$PROJECT_ID" \
 gcloud projects add-iam-policy-binding "$PROJECT_ID" \
 	--member=serviceAccount:"$SERVICE_ACCOUNT_EMAIL" \
 	--role=roles/container.clusterViewer
+gcloud projects add-iam-policy-binding "$PROJECT_ID" \
+	--member=serviceAccount:"$SERVICE_ACCOUNT_EMAIL" \
+	--role=roles/logging.logWriter
+gcloud projects add-iam-policy-binding "$PROJECT_ID" \
+	--member=serviceAccount:"$SERVICE_ACCOUNT_EMAIL" \
+	--role=roles/monitoring.metricWriter
+gcloud projects add-iam-policy-binding "$PROJECT_ID" \
+	--member=serviceAccount:"$SERVICE_ACCOUNT_EMAIL" \
+	--role=roles/stackdriver.resourceMetadata.writer
 ```
 
 - Enabling keyless authentication from [GitHub Actions GCP](https://cloud.google.com/blog/products/identity-security/enabling-keyless-authentication-from-github-actions)
