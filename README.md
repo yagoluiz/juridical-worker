@@ -1,5 +1,7 @@
 # Juridical Worker
 
+[![juridical-worker-deploy](https://github.com/yagoluiz/juridical-worker/actions/workflows/juridical-worker-deploy.yaml/badge.svg)](https://github.com/yagoluiz/juridical-worker/actions/workflows/juridical-worker-deploy.yaml)
+
 Worker responsible for identify legal process.
 
 ## Environment settings 
