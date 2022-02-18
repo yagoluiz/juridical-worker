@@ -106,12 +106,13 @@ public class LegalProcessWorker : BackgroundService
         if (!message.Success)
         {
             _logger.LogCritical($"LegalProcessWorker send error message: {message.Content}");
-            return;
         }
+        else
+        {
+            _logger.LogInformation($"LegalProcessWorker send success message: {(message.Content as MessageResponse)?.Id}");
 
-        _logger.LogInformation($"LegalProcessWorker send success message: {(message.Content as MessageResponse)?.Id}");
-
-        _memoryCache.Set(CacheKey, processCount, new MemoryCacheEntryOptions()
-            .AddExpirationToken(new CancellationChangeToken(stoppingToken)));
+            _memoryCache.Set(CacheKey, processCount, new MemoryCacheEntryOptions()
+                .AddExpirationToken(new CancellationChangeToken(stoppingToken)));
+        }
     }
 }
