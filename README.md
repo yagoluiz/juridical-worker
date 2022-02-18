@@ -90,7 +90,7 @@ docker push gcr.io/{PROJECT_ID}/juridical-worker:v1
 ...
       containers:
         - name: juridical-worker
-          image: gcr.io/{PROJECT_ID}/juridical-worker:latest
+          image: gcr.io/PROJECT_ID/IMAGE:TAG
 ...
 ```
 
@@ -111,7 +111,7 @@ minikube dashboard
 3) Run k8s files:
 
 ```bash
-sh k8s/deploy.sh
+sh k8s/local-deploy.sh
 ```
 
 ## Deploy
