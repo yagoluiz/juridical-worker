@@ -36,23 +36,30 @@ public class LegalProcessWorker : BackgroundService
 
             try
             {
-                var legalProcessBuilder = new LegalProcessBuilder(_configuration.GetValue<string>("WEB_DRIVER_URI"))
-                    .LoginPage(
-                        _configuration.GetValue<string>("LEGAL_PROCESS_URL"),
-                        _configuration.GetValue<string>("LEGAL_PROCESS_USER"),
-                        _configuration.GetValue<string>("LEGAL_PROCESS_PASSWORD"))
-                    .ProcessPage(_configuration.GetValue<string>("LEGAL_PROCESS_SERVICE_KEY"))
-                    .ProcessCount()
-                    .Quit()
-                    .Build();
+                var initHourActive = DateTime.Now.Hour >= _configuration.GetValue<int>("INIT_ACTIVE_IN_HOURS");
+                
+                _logger.LogInformation($"LegalProcessWorker init hour active: {initHourActive}");
+                
+                if (initHourActive)
+                {
+                    var legalProcessBuilder = new LegalProcessBuilder(_configuration.GetValue<string>("WEB_DRIVER_URI"))
+                        .LoginPage(
+                            _configuration.GetValue<string>("LEGAL_PROCESS_URL"),
+                            _configuration.GetValue<string>("LEGAL_PROCESS_USER"),
+                            _configuration.GetValue<string>("LEGAL_PROCESS_PASSWORD"))
+                        .ProcessPage(_configuration.GetValue<string>("LEGAL_PROCESS_SERVICE_KEY"))
+                        .ProcessCount()
+                        .Quit()
+                        .Build();
 
-                var processCount = legalProcessBuilder.ProcessCount;
-                var messageServiceActive = _configuration.GetValue<bool>("MESSAGE_SERVICE_ACTIVE");
+                    var processCount = legalProcessBuilder.ProcessCount;
+                    var messageServiceActive = _configuration.GetValue<bool>("MESSAGE_SERVICE_ACTIVE");
 
-                _logger.LogInformation($"LegalProcessWorker process count: {processCount}");
-                _logger.LogInformation($"LegalProcessWorker MESSAGE_SERVICE_ACTIVE: {messageServiceActive}");
+                    _logger.LogInformation($"LegalProcessWorker process count: {processCount}");
+                    _logger.LogInformation($"LegalProcessWorker MESSAGE_SERVICE_ACTIVE: {messageServiceActive}");
 
-                if (messageServiceActive) await ProcessCountAsync(processCount, stoppingToken);
+                    if (messageServiceActive) await ProcessCountAsync(processCount, stoppingToken);
+                }
             }
             catch (Exception exception)
             {
