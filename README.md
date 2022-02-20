@@ -113,7 +113,7 @@ minikube dashboard
 3) Run k8s files:
 
 ```bash
-sh k8s/local-deploy.sh
+sh local-deploy.sh
 ```
 
 ## Deploy
