@@ -135,7 +135,6 @@ jobs:
           kubectl create secret generic ${{ env.K8S_JURIDICAL_WORKER_SECRET }} -n ${{ env.K8S_NAMESPACE }} \
             --from-literal=WORKER_ACTIVE='${{ env.K8S_WORKER_ACTIVE }}' \
             --from-literal=LEGAL_PROCESS_USER='${{ env.K8S_LEGAL_PROCESS_USER }}' \
-            --from-literal=LEGAL_PROCESS_USER='${{ env.K8S_LEGAL_PROCESS_USER }}' \
             --from-literal=LEGAL_PROCESS_PASSWORD='${{ env.K8S_LEGAL_PROCESS_PASSWORD }}' \
             --from-literal=MESSAGE_SERVICE_API_TOKEN='${{ env.K8S_MESSAGE_SERVICE_API_TOKEN }}' \
             --from-literal=MESSAGE_SERVICE_FROM='${{ env.K8S_MESSAGE_SERVICE_FROM }}' \
