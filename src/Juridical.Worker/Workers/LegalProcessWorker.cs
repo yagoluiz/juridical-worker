@@ -37,9 +37,9 @@ public class LegalProcessWorker : BackgroundService
             try
             {
                 var initHourActive = DateTime.Now.Hour >= _configuration.GetValue<int>("INIT_ACTIVE_IN_HOURS");
-                
+
                 _logger.LogInformation($"LegalProcessWorker init hour active: {initHourActive}");
-                
+
                 if (initHourActive)
                 {
                     var legalProcessBuilder = new LegalProcessBuilder(_configuration.GetValue<string>("WEB_DRIVER_URI"))
@@ -49,6 +49,7 @@ public class LegalProcessWorker : BackgroundService
                             _configuration.GetValue<string>("LEGAL_PROCESS_PASSWORD"))
                         .ProcessPage(_configuration.GetValue<string>("LEGAL_PROCESS_SERVICE_KEY"))
                         .ProcessCount()
+                        .LogoffPage(_configuration.GetValue<string>("LEGAL_PROCESS_URL"))
                         .Quit()
                         .Build();
 

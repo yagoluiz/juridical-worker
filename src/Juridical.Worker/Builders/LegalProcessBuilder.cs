@@ -71,6 +71,13 @@ public class LegalProcessBuilder
         return this;
     }
 
+    public LegalProcessBuilder LogoffPage(string url)
+    {
+        _webDriver.Navigate().GoToUrl($"{url}/LogOn?PaginaAtual=-200");
+        
+        return this;
+    }
+
     public LegalProcessBuilder Quit()
     {
         _webDriver.Quit();
