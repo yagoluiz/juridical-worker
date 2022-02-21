@@ -26,6 +26,7 @@ env:
   GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
   GKE_ZONE: ${{ secrets.GKE_ZONE }}
 
+  K8S_WORKER_ACTIVE: ${{ secrets.K8S_WORKER_ACTIVE }}
   K8S_LEGAL_PROCESS_USER: ${{ secrets.K8S_LEGAL_PROCESS_USER }}
   K8S_LEGAL_PROCESS_PASSWORD: ${{ secrets.K8S_LEGAL_PROCESS_PASSWORD }}
   K8S_MESSAGE_SERVICE_API_TOKEN: ${{ secrets.K8S_MESSAGE_SERVICE_API_TOKEN }}
@@ -132,6 +133,8 @@ jobs:
       - name: Create k8s secrets
         run: |-
           kubectl create secret generic ${{ env.K8S_JURIDICAL_WORKER_SECRET }} -n ${{ env.K8S_NAMESPACE }} \
+            --from-literal=WORKER_ACTIVE='${{ env.K8S_WORKER_ACTIVE }}' \
+            --from-literal=LEGAL_PROCESS_USER='${{ env.K8S_LEGAL_PROCESS_USER }}' \
             --from-literal=LEGAL_PROCESS_USER='${{ env.K8S_LEGAL_PROCESS_USER }}' \
             --from-literal=LEGAL_PROCESS_PASSWORD='${{ env.K8S_LEGAL_PROCESS_PASSWORD }}' \
             --from-literal=MESSAGE_SERVICE_API_TOKEN='${{ env.K8S_MESSAGE_SERVICE_API_TOKEN }}' \
