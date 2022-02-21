@@ -19,6 +19,7 @@ src/Juridical.Worker
 2) Create secrets:
 
 ```bash
+dotnet user-secrets set "WORKER_ACTIVE" "{YOUR_SECRET}"
 dotnet user-secrets set "LEGAL_PROCESS_USER" "{YOUR_SECRET}"
 dotnet user-secrets set "LEGAL_PROCESS_PASSWORD" "{YOUR_SECRET}"
 dotnet user-secrets set "MESSAGE_SERVICE_API_TOKEN" "{YOUR_SECRET}"
@@ -31,6 +32,7 @@ dotnet user-secrets set "MESSAGE_SERVICE_TO" "{YOUR_SECRET}"
 - Create **.env** file
 
 ```bash
+WORKER_ACTIVE={YOUR_SECRET}
 LEGAL_PROCESS_USER={YOUR_SECRET}
 LEGAL_PROCESS_PASSWORD={YOUR_SECRET}
 MESSAGE_SERVICE_API_TOKEN={YOUR_SECRET}
