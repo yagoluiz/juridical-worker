@@ -17,6 +17,7 @@ on:
 env:
   DOTNET_VERSION: 6.0.x
   GCR_IMAGE: juridical-worker
+  GCR_IMAGE_ID: $GITHUB_RUN_NUMBER
   K8S_NAMESPACE: juridical
   K8S_JURIDICAL_WORKER_SECRET: juridical-worker-secret
 
@@ -85,7 +86,7 @@ jobs:
       - name: Docker build
         run: |-
           docker build \
-            --tag "gcr.io/$PROJECT_ID/$GCR_IMAGE:$GITHUB_SHA" \
+            --tag "gcr.io/$PROJECT_ID/$GCR_IMAGE:$GITHUB_SHA-${{ env.GCR_IMAGE_ID }}" \
             --tag "gcr.io/$PROJECT_ID/$GCR_IMAGE:latest" \
             .
 
@@ -147,6 +148,6 @@ jobs:
 
       - name: Deploy k8s
         run: |-
-          ./kustomize edit set image gcr.io/PROJECT_ID/IMAGE:TAG=gcr.io/$PROJECT_ID/$GCR_IMAGE:$GITHUB_SHA
+          ./kustomize edit set image gcr.io/PROJECT_ID/IMAGE:TAG=gcr.io/$PROJECT_ID/$GCR_IMAGE:$GITHUB_SHA-${{ env.GCR_IMAGE_ID }}
           ./kustomize build . | kubectl apply -f -
           kubectl rollout status deployment juridical-worker -n ${{ env.K8S_NAMESPACE }}
