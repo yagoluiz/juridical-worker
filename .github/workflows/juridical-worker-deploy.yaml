@@ -17,7 +17,7 @@ on:
 env:
   DOTNET_VERSION: 6.0.x
   GCR_IMAGE: juridical-worker
-  GCR_IMAGE_ID: $GITHUB_RUN_NUMBER
+  GCR_IMAGE_ID: $GITHUB_RUN_ATTEMPT
   K8S_NAMESPACE: juridical
   K8S_JURIDICAL_WORKER_SECRET: juridical-worker-secret
 
