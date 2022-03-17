@@ -19,12 +19,12 @@ src/Juridical.Worker
 2) Create secrets:
 
 ```bash
-dotnet user-secrets set "WORKER_ACTIVE" "{YOUR_SECRET}"
-dotnet user-secrets set "LEGAL_PROCESS_USER" "{YOUR_SECRET}"
-dotnet user-secrets set "LEGAL_PROCESS_PASSWORD" "{YOUR_SECRET}"
-dotnet user-secrets set "MESSAGE_SERVICE_API_TOKEN" "{YOUR_SECRET}"
-dotnet user-secrets set "MESSAGE_SERVICE_FROM" "{YOUR_SECRET}"
-dotnet user-secrets set "MESSAGE_SERVICE_TO" "{YOUR_SECRET}"
+dotnet user-secrets set "WORKER_ACTIVE" "YOUR_SECRET"
+dotnet user-secrets set "LEGAL_PROCESS_USER" "YOUR_SECRET"
+dotnet user-secrets set "LEGAL_PROCESS_PASSWORD" "YOUR_SECRET"
+dotnet user-secrets set "MESSAGE_SERVICE_API_TOKEN" "YOUR_SECRET"
+dotnet user-secrets set "MESSAGE_SERVICE_FROM" "YOUR_SECRET"
+dotnet user-secrets set "MESSAGE_SERVICE_TO" "YOUR_SECRET"
 ```
 
 ### Docker and Kubernetes
@@ -32,12 +32,12 @@ dotnet user-secrets set "MESSAGE_SERVICE_TO" "{YOUR_SECRET}"
 - Create **.env** file
 
 ```bash
-WORKER_ACTIVE={YOUR_SECRET}
-LEGAL_PROCESS_USER={YOUR_SECRET}
-LEGAL_PROCESS_PASSWORD={YOUR_SECRET}
-MESSAGE_SERVICE_API_TOKEN={YOUR_SECRET}
-MESSAGE_SERVICE_FROM={YOUR_SECRET}
-MESSAGE_SERVICE_TO={YOUR_SECRET}
+WORKER_ACTIVE=YOUR_SECRET
+LEGAL_PROCESS_USER=YOUR_SECRET
+LEGAL_PROCESS_PASSWORD=YOUR_SECRET
+MESSAGE_SERVICE_API_TOKEN=YOUR_SECRET
+MESSAGE_SERVICE_FROM=YOUR_SECRET
+MESSAGE_SERVICE_TO=YOUR_SECRET
 ```
 
 ## Instructions for run project
@@ -84,17 +84,17 @@ gcloud auth configure-docker
 
 ```bash
 docker build -t juridical/juridical-worker:v1 .
-docker tag juridical/juridical-worker:v1 gcr.io/{PROJECT_ID}/juridical-worker:v1
-docker push gcr.io/{PROJECT_ID}/juridical-worker:v1
+docker tag juridical/juridical-worker:v1 gcr.io/$PROJECT_ID/juridical-worker:v1
+docker push gcr.io/$PROJECT_ID/juridical-worker:v1
 ```
 
 4) Set image worker local deployment:
 
 ```yaml
 ...
-      containers:
-        - name: juridical-worker
-          image: gcr.io/PROJECT_ID/IMAGE:TAG
+containers:
+  - name: juridical-worker
+    image: gcr.io/PROJECT_ID/IMAGE:TAG
 ...
 ```
 
@@ -106,16 +106,16 @@ docker push gcr.io/{PROJECT_ID}/juridical-worker:v1
 minikube start
 ```
 
-2) (Optional) Open dashboard:
-
-```bash
-minikube dashboard
-```
-
-3) Run k8s files:
+2) Run k8s files:
 
 ```bash
 sh local-deploy.sh
+```
+
+3) (Optional) Open dashboard:
+
+```bash
+minikube dashboard
 ```
 
 ## Deploy
@@ -133,7 +133,7 @@ gcloud iam service-accounts create "$SERVICE_ACCOUNT_NAME" --display-name "$SERV
 2) Enable IAM Credentials:
 
 ```bash
-gcloud services enable iamcredentials.googleapis.com --project "${PROJECT_ID}"
+gcloud services enable iamcredentials.googleapis.com --project "$PROJECT_ID"
 ```
 
 3) Get service account email:
@@ -171,7 +171,7 @@ gcloud projects add-iam-policy-binding "$PROJECT_ID" \
 
 ```bash
 gcloud iam workload-identity-pools create "$POOL_NAME" \
-  --project="${PROJECT_ID}" \
+  --project="$PROJECT_ID" \
   --location="global" \
   --display-name="$POOL_DISPLAY_NAME"
 ```
@@ -180,7 +180,7 @@ gcloud iam workload-identity-pools create "$POOL_NAME" \
 
 ```bash
 gcloud iam workload-identity-pools describe "$POOL_NAME" \
-  --project="${PROJECT_ID}" \
+  --project="$PROJECT_ID" \
   --location="global" \
   --format="value(name)"
 ```
@@ -189,7 +189,7 @@ gcloud iam workload-identity-pools describe "$POOL_NAME" \
 
 ```bash
 gcloud iam workload-identity-pools providers create-oidc "$PROVIDER_NAME" \
-  --project="${PROJECT_ID}" \
+  --project="$PROJECT_ID" \
   --location="global" \
   --workload-identity-pool="$POOL_NAME" \
   --display-name="$PROVIDER_DISPLAY_NAME" \
@@ -201,16 +201,16 @@ gcloud iam workload-identity-pools providers create-oidc "$PROVIDER_NAME" \
 
 ```bash
 gcloud iam service-accounts add-iam-policy-binding "$SERVICE_ACCOUNT_EMAIL" \
-  --project="${PROJECT_ID}" \
+  --project="$PROJECT_ID" \
   --role="roles/iam.workloadIdentityUser" \
-  --member="principalSet://iam.googleapis.com/${WORKLOAD_IDENTITY_POOL_ID}/attribute.repository/${GITHUB_USER}/${GITHUB_REPOSITORY}"
+  --member="principalSet://iam.googleapis.com/$WORKLOAD_IDENTITY_POOL_ID/attribute.repository/$GITHUB_USER/$GITHUB_REPOSITORY"
 ```
 
 5) Get Workload Identity Provider resource name:
 
 ```bash
 gcloud iam workload-identity-pools providers describe "$PROVIDER_NAME" \
-  --project="${PROJECT_ID}" \
+  --project="$PROJECT_ID" \
   --location="global" \
   --workload-identity-pool="$POOL_NAME" \
   --format="value(name)"
