@@ -118,6 +118,72 @@ sh local-deploy.sh
 minikube dashboard
 ```
 
+## Infrastructure
+
+### Terraform
+
+- Create service account from [GCP](https://cloud.google.com/iam/docs/creating-managing-service-accounts)
+
+1) Create service account:
+
+```bash
+gcloud iam service-accounts create "$SERVICE_ACCOUNT_NAME" --display-name "$SERVICE_ACCOUNT_DISPLAY_NAME" --project "$PROJECT_ID"
+```
+
+2) Get service account email:
+
+```bash
+gcloud iam service-accounts list
+```
+
+3) Create credentials key:
+
+```bash
+# SERVICE_ACCOUNT_CREDENTIALS=~/.config/gcloud/CREDENTIALS_NAME.json
+
+gcloud iam service-accounts keys create $SERVICE_ACCOUNT_CREDENTIALS \
+  --iam-account "$SERVICE_ACCOUNT_EMAIL"
+```
+
+4) Get credentials key:
+
+```bash
+cat ~/.config/gcloud/CREDENTIALS_NAME.json
+```
+
+5) Add policy permissions:
+
+```bash
+gcloud projects add-iam-policy-binding "$PROJECT_ID" \
+	--member=serviceAccount:"$SERVICE_ACCOUNT_EMAIL" \
+	--role=roles/storage.admin
+gcloud projects add-iam-policy-binding "$PROJECT_ID" \
+	--member=serviceAccount:"$SERVICE_ACCOUNT_EMAIL" \
+	--role=roles/viewer
+```
+
+- Run local infrastructure
+
+1) Install and init [Terraform](https://www.terraform.io/downloads.html):
+
+```bash
+infra/ && terraform init
+```
+
+2) Execute plan:
+
+```bash
+# CREDENTIALS_FILE=file("../CREDENTIALS_NAME.json")
+
+terraform plan -var="project_id=$PROJECT_ID" -var="credentials_file=$CREDENTIALS_FILE"
+```
+
+3) Execute apply:
+
+```bash
+terraform apply
+```
+
 ## Deploy
 
 ### GitHub Actions
