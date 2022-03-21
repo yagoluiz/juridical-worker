@@ -140,19 +140,13 @@ gcloud iam service-accounts list
 3) Create credentials key:
 
 ```bash
-# SERVICE_ACCOUNT_CREDENTIALS=~/.config/gcloud/CREDENTIALS_NAME.json
+# SERVICE_ACCOUNT_CREDENTIALS=~/.config/gcloud/CREDENTIALS_FILE_NAME.json
 
 gcloud iam service-accounts keys create $SERVICE_ACCOUNT_CREDENTIALS \
   --iam-account $SERVICE_ACCOUNT_EMAIL
 ```
 
-4) Get credentials key:
-
-```bash
-cat ~/.config/gcloud/CREDENTIALS_NAME.json
-```
-
-5) Add policy permissions:
+4) Add policy permissions:
 
 ```bash
 gcloud projects add-iam-policy-binding $PROJECT_ID \
@@ -171,19 +165,23 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
 
 - Run local infrastructure
 
-1) Install and init [Terraform](https://www.terraform.io/downloads.html):
+1) Install [Terraform](https://www.terraform.io/downloads.html) and create GOOGLE_CREDENTIALS variable:
+
+```bash
+export GOOGLE_CREDENTIALS=~/.config/gcloud/CREDENTIALS_FILE_NAME.json
+```
+
+2) Execute init:
 
 ```bash
 infra/ && terraform init
 ```
 
-2) Execute apply:
+3) Execute apply:
 
 ```bash
-# CREDENTIALS_FILE=../CREDENTIALS_NAME.json
-
-terraform apply -var="project_id=$PROJECT_ID" \
-  -var="credentials_file=$CREDENTIALS_FILE" \
+terraform apply \
+  -var="project_id=$PROJECT_ID" \
   -var="service_account=$SERVICE_ACCOUNT_EMAIL"
 ```
 
