@@ -29,6 +29,11 @@ jobs:
         env:
           GOOGLE_CREDENTIALS: ${{ env.TERRAFORM_CREDENTIALS }}
 
+      - name: Validate
+        run: terraform validate
+        env:
+          GOOGLE_CREDENTIALS: ${{ env.TERRAFORM_CREDENTIALS }}
+
       - name: Destroy
         run: |-
           terraform destroy \
