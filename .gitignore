@@ -366,9 +366,6 @@ MigrationBackup/
 # Ignore generated credentials from google-github-actions/auth
 gha-creds-*.json
 
-# Ignore local terraform credentials
-terraform-credentials.json
-
 # Local .terraform directories
 **/.terraform/*
 

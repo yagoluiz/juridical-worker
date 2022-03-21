@@ -21,6 +21,9 @@ env:
   K8S_NAMESPACE: juridical
   K8S_JURIDICAL_WORKER_SECRET: juridical-worker-secret
 
+  TERRAFORM_CREDENTIALS: ${{ secrets.TERRAFORM_CREDENTIALS }}
+  TERRAFORM_SERVICE_ACCOUNT: ${{ secrets.TERRAFORM_SERVICE_ACCOUNT }}
+
   WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
   SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
@@ -54,11 +57,47 @@ jobs:
       - name: Build
         run: dotnet build --no-restore
 
+  terraform:
+    name: Terraform
+    runs-on: ubuntu-latest
+
+    needs: [build]
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Init
+        working-directory: infra
+        run: terraform init
+        env:
+          GOOGLE_CREDENTIALS: ${{ env.TERRAFORM_CREDENTIALS }}
+
+      - name: Validate
+        working-directory: infra
+        run: terraform validate
+        env:
+          GOOGLE_CREDENTIALS: ${{ env.TERRAFORM_CREDENTIALS }}
+
+      - name: Apply
+        working-directory: infra
+        run: |-
+          terraform apply \
+            -var="project_id=${{ env.PROJECT_ID }}" \
+            -var="service_account=${{ env.TERRAFORM_SERVICE_ACCOUNT }}" \
+            -auto-approve
+        env:
+          GOOGLE_CREDENTIALS: ${{ env.TERRAFORM_CREDENTIALS }}
+
   gcr-deploy:
     name: GCR Deploy
     runs-on: ubuntu-latest
 
-    needs: [build]
+    needs: [terraform]
     if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' }}
 
     permissions:
