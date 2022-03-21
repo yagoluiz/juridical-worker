@@ -41,6 +41,10 @@ jobs:
           GOOGLE_CREDENTIALS: ${{ env.TERRAFORM_CREDENTIALS }}
 
       - name: Destroy
-        run: terraform destroy -var="project_id=${{ env.PROJECT_ID }}" -var="service_account=${{ env.TERRAFORM_SERVICE_ACCOUNT }}" -auto-approve
+        run: |-
+          terraform destroy \
+            -var="project_id=${{ env.PROJECT_ID }}" \
+            -var="service_account=${{ env.TERRAFORM_SERVICE_ACCOUNT }}" \
+            -auto-approve
         env:
           GOOGLE_CREDENTIALS: ${{ env.TERRAFORM_CREDENTIALS }}
