@@ -1,0 +1,55 @@
+name: juridical-infra-destroy
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - "**/README.md"
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "**/README.md"
+
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: infra
+
+env:
+  TERRAFORM_CREDENTIALS: ${{ secrets.TERRAFORM_CREDENTIALS }}
+  PROJECT_ID: ${{ secrets.PROJECT_ID }}
+  TERRAFORM_SERVICE_ACCOUNT: ${{ secrets.TERRAFORM_SERVICE_ACCOUNT }}
+
+jobs:
+  terraform:
+    name: Terraform
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Init
+        run: terraform init
+        env:
+          GOOGLE_CREDENTIALS: ${{ env.TERRAFORM_CREDENTIALS }}
+
+      - name: Validate
+        run: terraform validate
+        env:
+          GOOGLE_CREDENTIALS: ${{ env.TERRAFORM_CREDENTIALS }}
+
+      - name: Apply
+        run: |-
+          terraform apply \
+            -var="project_id=${{ env.PROJECT_ID }}" \
+            -var="service_account=${{ env.TERRAFORM_SERVICE_ACCOUNT }}" \
+            -auto-approve
+        env:
+          GOOGLE_CREDENTIALS: ${{ env.TERRAFORM_CREDENTIALS }}
