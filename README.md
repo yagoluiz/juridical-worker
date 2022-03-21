@@ -4,7 +4,7 @@
 
 Worker responsible for identify legal process.
 
-## Environment settings 
+## Environment settings
 
 ### .NET
 
@@ -88,7 +88,7 @@ docker tag juridical/juridical-worker:v1 gcr.io/$PROJECT_ID/juridical-worker:v1
 docker push gcr.io/$PROJECT_ID/juridical-worker:v1
 ```
 
-4) Set image worker local deployment:
+4) Set image *juridical-worker-deployment.yaml* file:
 
 ```yaml
 ...
@@ -127,7 +127,8 @@ minikube dashboard
 1) Create service account:
 
 ```bash
-gcloud iam service-accounts create "$SERVICE_ACCOUNT_NAME" --display-name "$SERVICE_ACCOUNT_DISPLAY_NAME" --project "$PROJECT_ID"
+gcloud iam service-accounts create $SERVICE_ACCOUNT_NAME \
+  --display-name "$SERVICE_ACCOUNT_DISPLAY_NAME" --project $PROJECT_ID
 ```
 
 2) Get service account email:
@@ -142,7 +143,7 @@ gcloud iam service-accounts list
 # SERVICE_ACCOUNT_CREDENTIALS=~/.config/gcloud/CREDENTIALS_NAME.json
 
 gcloud iam service-accounts keys create $SERVICE_ACCOUNT_CREDENTIALS \
-  --iam-account "$SERVICE_ACCOUNT_EMAIL"
+  --iam-account $SERVICE_ACCOUNT_EMAIL
 ```
 
 4) Get credentials key:
@@ -154,11 +155,17 @@ cat ~/.config/gcloud/CREDENTIALS_NAME.json
 5) Add policy permissions:
 
 ```bash
-gcloud projects add-iam-policy-binding "$PROJECT_ID" \
-	--member=serviceAccount:"$SERVICE_ACCOUNT_EMAIL" \
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+	--member=serviceAccount:$SERVICE_ACCOUNT_EMAIL \
 	--role=roles/storage.admin
-gcloud projects add-iam-policy-binding "$PROJECT_ID" \
-	--member=serviceAccount:"$SERVICE_ACCOUNT_EMAIL" \
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+	--member=serviceAccount:$SERVICE_ACCOUNT_EMAIL \
+	--role=roles/container.admin
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+	--member=serviceAccount:$SERVICE_ACCOUNT_EMAIL \
+	--role=roles/iam.serviceAccountUser
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+	--member=serviceAccount:$SERVICE_ACCOUNT_EMAIL \
 	--role=roles/viewer
 ```
 
@@ -170,18 +177,22 @@ gcloud projects add-iam-policy-binding "$PROJECT_ID" \
 infra/ && terraform init
 ```
 
-2) Execute plan:
+2) Execute apply:
 
 ```bash
-# CREDENTIALS_FILE=file("../CREDENTIALS_NAME.json")
+# CREDENTIALS_FILE=../CREDENTIALS_NAME.json
 
-terraform plan -var="project_id=$PROJECT_ID" -var="credentials_file=$CREDENTIALS_FILE"
+terraform apply -var="project_id=$PROJECT_ID" \
+  -var="credentials_file=$CREDENTIALS_FILE" \
+  -var="service_account=$SERVICE_ACCOUNT_EMAIL"
 ```
 
-3) Execute apply:
+- (Optional) Create remote backend bucket in Cloud Storage:
+
+1) Create bucket:
 
 ```bash
-terraform apply
+gsutil mb -p $PROJECT_ID -l $LOCATION -b on gs://$BUCKET_NAME
 ```
 
 ## Deploy
@@ -193,13 +204,14 @@ terraform apply
 1) Create service account:
 
 ```bash
-gcloud iam service-accounts create "$SERVICE_ACCOUNT_NAME" --display-name "$SERVICE_ACCOUNT_DISPLAY_NAME" --project "$PROJECT_ID"
+gcloud iam service-accounts create $SERVICE_ACCOUNT_NAME \
+  --display-name "$SERVICE_ACCOUNT_DISPLAY_NAME" --project $PROJECT_ID
 ```
 
 2) Enable IAM Credentials:
 
 ```bash
-gcloud services enable iamcredentials.googleapis.com --project "$PROJECT_ID"
+gcloud services enable iamcredentials.googleapis.com --project $PROJECT_ID
 ```
 
 3) Get service account email:
@@ -211,23 +223,23 @@ gcloud iam service-accounts list
 4) Add policy permissions:
 
 ```bash
-gcloud projects add-iam-policy-binding "$PROJECT_ID" \
-	--member=serviceAccount:"$SERVICE_ACCOUNT_EMAIL" \
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+	--member=serviceAccount:$SERVICE_ACCOUNT_EMAIL \
 	--role=roles/container.admin
-gcloud projects add-iam-policy-binding "$PROJECT_ID" \
-	--member=serviceAccount:"$SERVICE_ACCOUNT_EMAIL" \
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+	--member=serviceAccount:$SERVICE_ACCOUNT_EMAIL \
 	--role=roles/storage.admin
-gcloud projects add-iam-policy-binding "$PROJECT_ID" \
-	--member=serviceAccount:"$SERVICE_ACCOUNT_EMAIL" \
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+	--member=serviceAccount:$SERVICE_ACCOUNT_EMAIL \
 	--role=roles/container.clusterViewer
-gcloud projects add-iam-policy-binding "$PROJECT_ID" \
-	--member=serviceAccount:"$SERVICE_ACCOUNT_EMAIL" \
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+	--member=serviceAccount:$SERVICE_ACCOUNT_EMAIL \
 	--role=roles/logging.logWriter
-gcloud projects add-iam-policy-binding "$PROJECT_ID" \
-	--member=serviceAccount:"$SERVICE_ACCOUNT_EMAIL" \
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+	--member=serviceAccount:$SERVICE_ACCOUNT_EMAIL \
 	--role=roles/monitoring.metricWriter
-gcloud projects add-iam-policy-binding "$PROJECT_ID" \
-	--member=serviceAccount:"$SERVICE_ACCOUNT_EMAIL" \
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+	--member=serviceAccount:$SERVICE_ACCOUNT_EMAIL \
 	--role=roles/stackdriver.resourceMetadata.writer
 ```
 
