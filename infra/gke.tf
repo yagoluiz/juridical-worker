@@ -14,7 +14,7 @@ resource "google_container_node_pool" "juridical-node-pool" {
 
   node_config {
     preemptible  = false
-    machine_type = "e2-custom-1-1024" # 1 GB/ 1 MB
+    machine_type = "e2-small"
     disk_size_gb = 10
 
     # Create manually: https://github.com/yagoluiz/juridical-worker#deploy (create service account)
