@@ -27,6 +27,7 @@ services:
       - MESSAGE_SERVICE_API_TOKEN
       - MESSAGE_SERVICE_TO
       - MESSAGE_SERVICE_FROM
+      - Logging__Console__FormatterName=""
     networks:
       - worker-network
     depends_on:

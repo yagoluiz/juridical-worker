@@ -17,6 +17,8 @@ spec:
           env:
             - name: ASPNETCORE_ENVIRONMENT
               value: Production
+            - name: Logging__Console__FormatterName
+              value: ""
           envFrom:
             - secretRef:
                 name: juridical-worker-secret
