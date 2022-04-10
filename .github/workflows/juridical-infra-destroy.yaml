@@ -10,7 +10,7 @@ defaults:
 env:
   TERRAFORM_CREDENTIALS: ${{ secrets.TERRAFORM_CREDENTIALS }}
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
-  TERRAFORM_SERVICE_ACCOUNT: ${{ secrets.TERRAFORM_SERVICE_ACCOUNT }}
+  JURIDICAL_SERVICE_ACCOUNT: ${{ secrets.JURIDICAL_SERVICE_ACCOUNT }}
 
 jobs:
   terraform:
@@ -38,7 +38,7 @@ jobs:
         run: |-
           terraform destroy \
             -var="project_id=${{ env.PROJECT_ID }}" \
-            -var="service_account=${{ env.TERRAFORM_SERVICE_ACCOUNT }}" \
+            -var="service_account=${{ env.JURIDICAL_SERVICE_ACCOUNT }}" \
             -auto-approve
         env:
           GOOGLE_CREDENTIALS: ${{ env.TERRAFORM_CREDENTIALS }}
