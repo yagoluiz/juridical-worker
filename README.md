@@ -47,7 +47,7 @@ MESSAGE_SERVICE_TO=YOUR_SECRET
 1) Run selenium:
 
 ```bash
-docker run -d -p 4444:4444 -p 7900:7900 --shm-size="2g" --name selenium selenium/standalone-chrome:4.1.1-20220121
+docker run -d -p 4444:4444 -p 7900:7900 --shm-size="2g" -e VNC_NO_PASSWORD=1 --name selenium selenium/standalone-chrome:4.1.1-20220121
 ```
 
 2) Run project:
