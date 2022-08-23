@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Juridical.Worker.Models.Requests;
+namespace Juridical.Core.Models.Requests;
 
 public record MessageRequest(
     [property: JsonPropertyName("from")] string From,

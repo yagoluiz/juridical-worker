@@ -1,10 +1,11 @@
 using System.Net.Http.Json;
 using System.Text.Json;
-using Juridical.Worker.Interfaces;
-using Juridical.Worker.Models.Requests;
-using Juridical.Worker.Models.Responses;
+using Juridical.Core.Interfaces;
+using Juridical.Core.Models.Requests;
+using Juridical.Core.Models.Responses;
+using Microsoft.Extensions.Configuration;
 
-namespace Juridical.Worker.Services;
+namespace Juridical.Core.Services;
 
 public class MessageService : IMessageService
 {

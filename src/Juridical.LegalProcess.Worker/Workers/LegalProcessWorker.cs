@@ -1,11 +1,11 @@
-using Juridical.Worker.Builders;
-using Juridical.Worker.Interfaces;
-using Juridical.Worker.Models.Requests;
-using Juridical.Worker.Models.Responses;
+using Juridical.Core.Builders;
+using Juridical.Core.Interfaces;
+using Juridical.Core.Models.Requests;
+using Juridical.Core.Models.Responses;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Primitives;
 
-namespace Juridical.Worker.Workers;
+namespace Juridical.LegalProcess.Worker.Workers;
 
 public class LegalProcessWorker : BackgroundService
 {

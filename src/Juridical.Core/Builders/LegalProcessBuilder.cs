@@ -1,9 +1,9 @@
-using Juridical.Worker.Models;
+using Juridical.Core.Models;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Remote;
 
-namespace Juridical.Worker.Builders;
+namespace Juridical.Core.Builders;
 
 public class LegalProcessBuilder
 {
