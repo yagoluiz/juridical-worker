@@ -2,18 +2,18 @@ apiVersion: apps/v1
 kind: Deployment
 
 metadata:
-  name: juridical-worker
+  name: juridical-legal-process-worker
   namespace: juridical
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: juridical-worker
+        app: juridical-legal-process-worker
     spec:
       containers:
-        - name: juridical-worker
-          image: gcr.io/PROJECT_ID/IMAGE:TAG
+        - name: juridical-legal-process-worker
+          image: gcr.io/PROJECT_ID/LEGAL_PROCESS_IMAGE:TAG
           env:
             - name: ASPNETCORE_ENVIRONMENT
               value: Production
@@ -21,8 +21,8 @@ spec:
               value: ""
           envFrom:
             - secretRef:
-                name: juridical-worker-secret
+                name: juridical-legal-process-secret
       restartPolicy: Always
   selector:
     matchLabels:
-      app: juridical-worker
+      app: juridical-legal-process-worker

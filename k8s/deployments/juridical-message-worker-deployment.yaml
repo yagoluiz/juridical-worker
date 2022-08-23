@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: juridical-message-worker
+  namespace: juridical
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: juridical-message-worker
+    spec:
+      containers:
+        - name: juridical-message-worker
+          image: gcr.io/PROJECT_ID/MESSAGE_IMAGE:TAG
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Production
+            - name: Logging__Console__FormatterName
+              value: ""
+          envFrom:
+            - secretRef:
+                name: juridical-message-secret
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: juridical-message-worker

@@ -4,24 +4,34 @@
 
 Worker responsible for identify legal process.
 
-## Environment settings
+## Environment settings local
 
 ### .NET
 
 - Use [dotnet user-secrets](https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets)
 
-1) Get project folder:
+1) Get project folder legal process worker:
 
 ```bash
-src/Juridical.Worker
+src/Juridical.LegalProcess.Worker
 ```
 
 2) Create secrets:
 
 ```bash
-dotnet user-secrets set "WORKER_ACTIVE" "YOUR_SECRET"
 dotnet user-secrets set "LEGAL_PROCESS_USER" "YOUR_SECRET"
 dotnet user-secrets set "LEGAL_PROCESS_PASSWORD" "YOUR_SECRET"
+```
+
+1) Get project folder message worker:
+
+```bash
+src/Juridical.Message.Worker
+```
+
+2) Create secrets:
+
+```bash
 dotnet user-secrets set "MESSAGE_SERVICE_API_TOKEN" "YOUR_SECRET"
 dotnet user-secrets set "MESSAGE_SERVICE_FROM" "YOUR_SECRET"
 dotnet user-secrets set "MESSAGE_SERVICE_TO" "YOUR_SECRET"
@@ -32,7 +42,6 @@ dotnet user-secrets set "MESSAGE_SERVICE_TO" "YOUR_SECRET"
 - Create **.env** file
 
 ```bash
-WORKER_ACTIVE=YOUR_SECRET
 LEGAL_PROCESS_USER=YOUR_SECRET
 LEGAL_PROCESS_PASSWORD=YOUR_SECRET
 MESSAGE_SERVICE_API_TOKEN=YOUR_SECRET
@@ -80,21 +89,37 @@ gcloud auth login
 gcloud auth configure-docker
 ```
 
-3) Push image for private registry:
+3) Push images for private registry:
 
 ```bash
-docker build -t juridical/juridical-worker:v1 .
-docker tag juridical/juridical-worker:v1 gcr.io/$PROJECT_ID/juridical-worker:v1
-docker push gcr.io/$PROJECT_ID/juridical-worker:v1
+docker build -t juridical/juridical-legal-process-worker:v1 .
+docker tag juridical/juridical-legal-process-worker:v1 gcr.io/$PROJECT_ID/juridical-legal-process-worker:v1
+docker push gcr.io/$PROJECT_ID/juridical-legal-process-worker:v1
 ```
 
-4) Set image *juridical-worker-deployment.yaml* file:
+```bash
+docker build -t juridical/juridical-message-worker:v1 .
+docker tag juridical/juridical-message-worker:v1 gcr.io/$PROJECT_ID/juridical-message-worker:v1
+docker push gcr.io/$PROJECT_ID/juridical-message-worker:v1
+```
+
+4) Set image *juridical-legal-process-worker-deployment.yaml* file:
 
 ```yaml
 ...
 containers:
   - name: juridical-worker
-    image: gcr.io/PROJECT_ID/IMAGE:TAG
+    image: gcr.io/PROJECT_ID/LEGAL_PROCESS_IMAGE:TAG
+...
+```
+
+5) Set image *juridical-message-deployment.yaml* file:
+
+```yaml
+...
+containers:
+  - name: juridical-worker
+    image: gcr.io/PROJECT_ID/MESSAGE_IMAGE:TAG
 ...
 ```
 

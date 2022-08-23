@@ -12,26 +12,41 @@ services:
       - worker-network
     restart: always
   
-  juridical-worker:
-    container_name: juridical-worker
-    image: juridical-worker
+  juridical-legal-process-worker:
+    container_name: juridical-legal-process-worker
+    image: juridical-legal-process-worker
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: src/Juridical.LegalProcess.Worker/Dockerfile
     env_file:
       - .env
     environment:
       - DOTNET_ENVIRONMENT=Production
       - LEGAL_PROCESS_USER
       - LEGAL_PROCESS_PASSWORD
+      - Logging__Console__FormatterName=""
+    networks:
+      - worker-network
+    depends_on:
+      - juridical-selenium
+    restart: always
+
+  juridical-message-worker:
+    container_name: juridical-message-worker
+    image: juridical-message-worker
+    build:
+      context: .
+      dockerfile: src/Juridical.Message.Worker/Dockerfile
+    env_file:
+      - .env
+    environment:
+      - DOTNET_ENVIRONMENT=Production
       - MESSAGE_SERVICE_API_TOKEN
       - MESSAGE_SERVICE_TO
       - MESSAGE_SERVICE_FROM
       - Logging__Console__FormatterName=""
     networks:
       - worker-network
-    depends_on:
-      - juridical-selenium
     restart: always
 
 networks:

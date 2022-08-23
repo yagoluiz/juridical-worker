@@ -3,5 +3,6 @@ kind: Kustomization
 
 resources:
   - k8s/deployments/juridical-selenium-deployment.yaml
-  - k8s/deployments/juridical-worker-deployment.yaml
+  - k8s/deployments/juridical-legal-process-worker-deployment.yaml
+  - k8s/deployments/juridical-message-worker-deployment.yaml
   - k8s/services/juridical-selenium-service.yaml

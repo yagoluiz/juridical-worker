@@ -36,13 +36,11 @@ public class LegalProcessWorker : BackgroundService
 
             try
             {
-                var workerActive = _configuration.GetValue<bool>("WORKER_ACTIVE");
                 var initHourActive = DateTime.Now.Hour >= _configuration.GetValue<int>("INIT_ACTIVE_IN_HOURS");
 
-                _logger.LogInformation($"LegalProcessWorker WORKER_ACTIVE: {workerActive}");
                 _logger.LogInformation($"LegalProcessWorker INIT_ACTIVE_IN_HOURS: {initHourActive}");
 
-                if (workerActive && initHourActive)
+                if (initHourActive)
                 {
                     var legalProcessBuilder = new LegalProcessBuilder(_configuration.GetValue<string>("WEB_DRIVER_URI"))
                         .LoginPage(

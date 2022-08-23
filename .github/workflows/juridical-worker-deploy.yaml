@@ -16,10 +16,12 @@ on:
 
 env:
   DOTNET_VERSION: 6.0.x
-  GCR_IMAGE: juridical-worker
+  GCR_LEGAL_PROCESS_IMAGE: juridical-legal-process-worker
+  GCR_MESSAGE_IMAGE: juridical-message-worker
   GCR_IMAGE_ID: $GITHUB_RUN_ATTEMPT
   K8S_NAMESPACE: juridical
-  K8S_JURIDICAL_WORKER_SECRET: juridical-worker-secret
+  K8S_LEGAL_PROCESS_SECRET: juridical-legal-process-secret
+  K8S_MESSAGE_SECRET: juridical-message-secret
 
   TERRAFORM_CREDENTIALS: ${{ secrets.TERRAFORM_CREDENTIALS }}
   TERRAFORM_SERVICE_ACCOUNT: ${{ secrets.TERRAFORM_SERVICE_ACCOUNT }}
@@ -122,16 +124,24 @@ jobs:
         run: |-
           gcloud --quiet auth configure-docker
 
-      - name: Docker build
+      - name: Docker build - ${{ env.GCR_LEGAL_PROCESS_IMAGE }}
         run: |-
           docker build \
-            --tag "gcr.io/$PROJECT_ID/$GCR_IMAGE:$GITHUB_SHA-${{ env.GCR_IMAGE_ID }}" \
-            --tag "gcr.io/$PROJECT_ID/$GCR_IMAGE:latest" \
-            .
+            --tag "gcr.io/$PROJECT_ID/$GCR_LEGAL_PROCESS_IMAGE:$GITHUB_SHA-${{ env.GCR_IMAGE_ID }}" \
+            --tag "gcr.io/$PROJECT_ID/$GCR_LEGAL_PROCESS_IMAGE:latest" \
+            /src/Juridical.LegalProcess.Worker/ .
+          
+      - name: Docker build - ${{ env.GCR_MESSAGE_IMAGE }}
+        run: |-
+          docker build \
+            --tag "gcr.io/$PROJECT_ID/$GCR_MESSAGE_IMAGE:$GITHUB_SHA-${{ env.GCR_IMAGE_ID }}" \
+            --tag "gcr.io/$PROJECT_ID/$GCR_MESSAGE_IMAGE:latest" \
+            /src/Juridical.Message.Worker/ .
 
       - name: Docker publish
         run: |-
-          docker push --all-tags "gcr.io/$PROJECT_ID/$GCR_IMAGE"
+          docker push --all-tags "gcr.io/$PROJECT_ID/$GCR_LEGAL_PROCESS_IMAGE" && \
+          docker push --all-tags "gcr.io/$PROJECT_ID/$GCR_MESSAGE_IMAGE"
 
   gke-deploy:
     name: GKE Deploy
@@ -170,12 +180,15 @@ jobs:
         run: |-
           kubectl delete secret ${{ env.K8S_JURIDICAL_WORKER_SECRET }} -n ${{ env.K8S_NAMESPACE }} --ignore-not-found
 
-      - name: Create k8s secrets
+      - name: Create k8s secrets - juridical-legal-process-secret
         run: |-
-          kubectl create secret generic ${{ env.K8S_JURIDICAL_WORKER_SECRET }} -n ${{ env.K8S_NAMESPACE }} \
-            --from-literal=WORKER_ACTIVE='${{ env.K8S_WORKER_ACTIVE }}' \
+          kubectl create secret generic ${{ env.K8S_LEGAL_PROCESS_SECRET }} -n ${{ env.K8S_NAMESPACE }} \
             --from-literal=LEGAL_PROCESS_USER='${{ env.K8S_LEGAL_PROCESS_USER }}' \
             --from-literal=LEGAL_PROCESS_PASSWORD='${{ env.K8S_LEGAL_PROCESS_PASSWORD }}' \
+
+      - name: Create k8s secrets - juridical-message-secret
+        run: |-
+          kubectl create secret generic ${{ env.K8S_MESSAGE_SECRET }} -n ${{ env.K8S_NAMESPACE }} \
             --from-literal=MESSAGE_SERVICE_API_TOKEN='${{ env.K8S_MESSAGE_SERVICE_API_TOKEN }}' \
             --from-literal=MESSAGE_SERVICE_FROM='${{ env.K8S_MESSAGE_SERVICE_FROM }}' \
             --from-literal=MESSAGE_SERVICE_TO='${{ env.K8S_MESSAGE_SERVICE_TO }}'
@@ -185,8 +198,14 @@ jobs:
           curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
           chmod u+x ./kustomize
 
-      - name: Deploy k8s
+      - name: Deploy k8s - juridical-legal-process-worker
         run: |-
-          ./kustomize edit set image gcr.io/PROJECT_ID/IMAGE:TAG=gcr.io/$PROJECT_ID/$GCR_IMAGE:$GITHUB_SHA-${{ env.GCR_IMAGE_ID }}
+          ./kustomize edit set image gcr.io/PROJECT_ID/LEGAL_PROCESS_IMAGE:TAG=gcr.io/$PROJECT_ID/$LEGAL_PROCESS_IMAGE:$GITHUB_SHA-${{ env.GCR_IMAGE_ID }}
           ./kustomize build . | kubectl apply -f -
-          kubectl rollout status deployment juridical-worker -n ${{ env.K8S_NAMESPACE }}
+          kubectl rollout status deployment juridical-legal-process-worker -n ${{ env.K8S_NAMESPACE }}
+
+      - name: Deploy k8s - juridical-message-worker
+        run: |-
+          ./kustomize edit set image gcr.io/PROJECT_ID/MESSAGE_IMAGE:TAG=gcr.io/$PROJECT_ID/$MESSAGE_IMAGE:$GITHUB_SHA-${{ env.GCR_IMAGE_ID }}
+          ./kustomize build . | kubectl apply -f -
+          kubectl rollout status deployment juridical-message-worker -n ${{ env.K8S_NAMESPACE }}
