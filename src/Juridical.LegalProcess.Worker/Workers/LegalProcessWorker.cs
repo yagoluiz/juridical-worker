@@ -1,7 +1,4 @@
 using Juridical.Core.Builders;
-using Juridical.Core.Interfaces;
-using Juridical.Core.Models.Requests;
-using Juridical.Core.Models.Responses;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Primitives;
 
@@ -9,7 +6,6 @@ namespace Juridical.LegalProcess.Worker.Workers;
 
 public class LegalProcessWorker : BackgroundService
 {
-    private readonly IMessageService _messageService;
     private readonly IMemoryCache _memoryCache;
     private readonly IConfiguration _configuration;
     private readonly ILogger<LegalProcessWorker> _logger;
@@ -17,12 +13,10 @@ public class LegalProcessWorker : BackgroundService
     private const string CacheKey = "LegalProcessKey";
 
     public LegalProcessWorker(
-        IMessageService messageService,
         IMemoryCache memoryCache,
         IConfiguration configuration,
         ILogger<LegalProcessWorker> logger)
     {
-        _messageService = messageService;
         _memoryCache = memoryCache;
         _configuration = configuration;
         _logger = logger;
@@ -91,29 +85,7 @@ public class LegalProcessWorker : BackgroundService
 
         _logger.LogInformation($"LegalProcessWorker process count send message: {sendMessage}");
 
-        if (sendMessage) await SendMessageAsync(processCount, stoppingToken);
-    }
-
-    private async Task SendMessageAsync(int processCount, CancellationToken stoppingToken)
-    {
-        var message = await _messageService.SendAsync(new MessageRequest(
-            _configuration.GetValue<string>("MESSAGE_SERVICE_FROM"),
-            _configuration.GetValue<string>("MESSAGE_SERVICE_TO"),
-            new List<MessageContentRequest>
-            {
-                new($"Atenção! Você tem um total de {processCount} processo(s) não analisado(s). Acesse https://bit.ly/3gtEHEB para mais informações.")
-            }));
-
-        if (!message.Success)
-        {
-            _logger.LogCritical($"LegalProcessWorker send error message: {message.Content}");
-        }
-        else
-        {
-            _logger.LogInformation($"LegalProcessWorker send success message: {(message.Content as MessageResponse)?.Id}");
-
-            _memoryCache.Set(CacheKey, processCount, new MemoryCacheEntryOptions()
-                .AddExpirationToken(new CancellationChangeToken(stoppingToken)));
-        }
+        //TODO: Send topic message
+        //if (sendMessage) await SendMessageAsync(processCount, stoppingToken);
     }
 }
