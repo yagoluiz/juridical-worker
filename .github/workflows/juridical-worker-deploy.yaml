@@ -127,16 +127,18 @@ jobs:
       - name: Docker build - ${{ env.GCR_LEGAL_PROCESS_IMAGE }}
         run: |-
           docker build \
-            --tag "gcr.io/$PROJECT_ID/$GCR_LEGAL_PROCESS_IMAGE:$GITHUB_SHA-${{ env.GCR_IMAGE_ID }}" \
-            --tag "gcr.io/$PROJECT_ID/$GCR_LEGAL_PROCESS_IMAGE:latest" \
-            /src/Juridical.LegalProcess.Worker/ .
+            -f ./src/Juridical.LegalProcess.Worker/Dockerfile \
+            -t "gcr.io/$PROJECT_ID/$GCR_LEGAL_PROCESS_IMAGE:$GITHUB_SHA-${{ env.GCR_IMAGE_ID }}" \
+            -t "gcr.io/$PROJECT_ID/$GCR_LEGAL_PROCESS_IMAGE:latest" \
+            ./src/
           
       - name: Docker build - ${{ env.GCR_MESSAGE_IMAGE }}
         run: |-
           docker build \
-            --tag "gcr.io/$PROJECT_ID/$GCR_MESSAGE_IMAGE:$GITHUB_SHA-${{ env.GCR_IMAGE_ID }}" \
-            --tag "gcr.io/$PROJECT_ID/$GCR_MESSAGE_IMAGE:latest" \
-            /src/Juridical.Message.Worker/ .
+            -f ./src/Juridical.Message.Worker/Dockerfile \
+            -t "gcr.io/$PROJECT_ID/$GCR_MESSAGE_IMAGE:$GITHUB_SHA-${{ env.GCR_IMAGE_ID }}" \
+            -t "gcr.io/$PROJECT_ID/$GCR_MESSAGE_IMAGE:latest" \
+            ./src/
 
       - name: Docker publish
         run: |-
