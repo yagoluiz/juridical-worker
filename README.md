@@ -155,7 +155,10 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
 	--role=roles/iam.serviceAccountUser
 gcloud projects add-iam-policy-binding $PROJECT_ID \
 	--member=serviceAccount:$SERVICE_ACCOUNT_EMAIL \
-	--role=roles/viewer
+	--role=roles/viewer \
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+	--member=serviceAccount:$SERVICE_ACCOUNT_EMAIL \
+	--role=roles/pubsub.admin
 ```
 
 - Run local infrastructure
