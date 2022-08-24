@@ -25,16 +25,19 @@ jobs:
         uses: hashicorp/setup-terraform@v2
 
       - name: Init
+        working-directory: infra
         run: terraform init
         env:
           GOOGLE_CREDENTIALS: ${{ env.TERRAFORM_CREDENTIALS }}
 
       - name: Validate
+        working-directory: infra
         run: terraform validate
         env:
           GOOGLE_CREDENTIALS: ${{ env.TERRAFORM_CREDENTIALS }}
 
       - name: Destroy
+        working-directory: infra
         run: |-
           terraform destroy \
             -var="project_id=${{ env.PROJECT_ID }}" \
