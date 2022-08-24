@@ -24,15 +24,12 @@ env:
   K8S_MESSAGE_SECRET: juridical-message-secret
 
   TERRAFORM_CREDENTIALS: ${{ secrets.TERRAFORM_CREDENTIALS }}
-  TERRAFORM_SERVICE_ACCOUNT: ${{ secrets.TERRAFORM_SERVICE_ACCOUNT }}
-
   WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
   JURIDICAL_SERVICE_ACCOUNT: ${{ secrets.JURIDICAL_SERVICE_ACCOUNT }}
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
   GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
   GKE_ZONE: ${{ secrets.GKE_ZONE }}
 
-  K8S_WORKER_ACTIVE: ${{ secrets.K8S_WORKER_ACTIVE }}
   K8S_LEGAL_PROCESS_USER: ${{ secrets.K8S_LEGAL_PROCESS_USER }}
   K8S_LEGAL_PROCESS_PASSWORD: ${{ secrets.K8S_LEGAL_PROCESS_PASSWORD }}
   K8S_MESSAGE_SERVICE_API_TOKEN: ${{ secrets.K8S_MESSAGE_SERVICE_API_TOKEN }}
@@ -178,17 +175,18 @@ jobs:
         run: |-
           kubectl apply -f k8s/namespaces/juridical-namespace.yaml
 
-      - name: Delete k8s secret
+      - name: Delete k8s secrets
         run: |-
-          kubectl delete secret ${{ env.K8S_JURIDICAL_WORKER_SECRET }} -n ${{ env.K8S_NAMESPACE }} --ignore-not-found
+          kubectl delete secret ${{ env.K8S_LEGAL_PROCESS_SECRET }} -n ${{ env.K8S_NAMESPACE }} --ignore-not-found && \
+          kubectl delete secret ${{ env.K8S_MESSAGE_SECRET }} -n ${{ env.K8S_NAMESPACE }} --ignore-not-found
 
-      - name: Create k8s secrets - juridical-legal-process-secret
+      - name: Create k8s secret - ${{ env.K8S_LEGAL_PROCESS_SECRET }}
         run: |-
           kubectl create secret generic ${{ env.K8S_LEGAL_PROCESS_SECRET }} -n ${{ env.K8S_NAMESPACE }} \
             --from-literal=LEGAL_PROCESS_USER='${{ env.K8S_LEGAL_PROCESS_USER }}' \
             --from-literal=LEGAL_PROCESS_PASSWORD='${{ env.K8S_LEGAL_PROCESS_PASSWORD }}' \
 
-      - name: Create k8s secrets - juridical-message-secret
+      - name: Create k8s secrets - ${{ env.K8S_MESSAGE_SECRET }}
         run: |-
           kubectl create secret generic ${{ env.K8S_MESSAGE_SECRET }} -n ${{ env.K8S_NAMESPACE }} \
             --from-literal=MESSAGE_SERVICE_API_TOKEN='${{ env.K8S_MESSAGE_SERVICE_API_TOKEN }}' \
@@ -200,13 +198,13 @@ jobs:
           curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
           chmod u+x ./kustomize
 
-      - name: Deploy k8s - juridical-legal-process-worker
+      - name: Deploy k8s - ${{ env.GCR_LEGAL_PROCESS_IMAGE }}
         run: |-
           ./kustomize edit set image gcr.io/PROJECT_ID/LEGAL_PROCESS_IMAGE:TAG=gcr.io/$PROJECT_ID/$LEGAL_PROCESS_IMAGE:$GITHUB_SHA-${{ env.GCR_IMAGE_ID }}
           ./kustomize build . | kubectl apply -f -
           kubectl rollout status deployment juridical-legal-process-worker -n ${{ env.K8S_NAMESPACE }}
 
-      - name: Deploy k8s - juridical-message-worker
+      - name: Deploy k8s - ${{ env.GCR_MESSAGE_IMAGE }}
         run: |-
           ./kustomize edit set image gcr.io/PROJECT_ID/MESSAGE_IMAGE:TAG=gcr.io/$PROJECT_ID/$MESSAGE_IMAGE:$GITHUB_SHA-${{ env.GCR_IMAGE_ID }}
           ./kustomize build . | kubectl apply -f -

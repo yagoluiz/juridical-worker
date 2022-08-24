@@ -9,8 +9,8 @@ defaults:
 
 env:
   TERRAFORM_CREDENTIALS: ${{ secrets.TERRAFORM_CREDENTIALS }}
-  PROJECT_ID: ${{ secrets.PROJECT_ID }}
   JURIDICAL_SERVICE_ACCOUNT: ${{ secrets.JURIDICAL_SERVICE_ACCOUNT }}
+  PROJECT_ID: ${{ secrets.PROJECT_ID }}
 
 jobs:
   terraform:
