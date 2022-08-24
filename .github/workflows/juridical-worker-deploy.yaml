@@ -200,8 +200,8 @@ jobs:
 
       - name: Deploy k8s
         run: |-
-          ./kustomize edit set image gcr.io/PROJECT_ID/LEGAL_PROCESS_IMAGE:TAG=gcr.io/$PROJECT_ID/$LEGAL_PROCESS_IMAGE:$GITHUB_SHA-${{ env.GCR_IMAGE_ID }}
-          ./kustomize edit set image gcr.io/PROJECT_ID/MESSAGE_IMAGE:TAG=gcr.io/$PROJECT_ID/$MESSAGE_IMAGE:$GITHUB_SHA-${{ env.GCR_IMAGE_ID }}
+          ./kustomize edit set image gcr.io/PROJECT_ID/LEGAL_PROCESS_IMAGE:TAG=gcr.io/$PROJECT_ID/$GCR_LEGAL_PROCESS_IMAGE:$GITHUB_SHA-${{ env.GCR_IMAGE_ID }}
+          ./kustomize edit set image gcr.io/PROJECT_ID/MESSAGE_IMAGE:TAG=gcr.io/$PROJECT_ID/$GCR_MESSAGE_IMAGE:$GITHUB_SHA-${{ env.GCR_IMAGE_ID }}
           ./kustomize build . | kubectl apply -f -
           kubectl rollout status deployment juridical-legal-process-worker -n ${{ env.K8S_NAMESPACE }}
           kubectl rollout status deployment juridical-message-worker -n ${{ env.K8S_NAMESPACE }}
