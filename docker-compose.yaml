@@ -16,8 +16,8 @@ services:
     container_name: juridical-legal-process-worker
     image: juridical-legal-process-worker
     build:
-      context: .
-      dockerfile: src/Juridical.LegalProcess.Worker/Dockerfile
+      context: ./src
+      dockerfile: Juridical.LegalProcess.Worker/Dockerfile
     env_file:
       - .env
     environment:
@@ -35,8 +35,8 @@ services:
     container_name: juridical-message-worker
     image: juridical-message-worker
     build:
-      context: .
-      dockerfile: src/Juridical.Message.Worker/Dockerfile
+      context: ./src
+      dockerfile: Juridical.Message.Worker/Dockerfile
     env_file:
       - .env
     environment:

@@ -2,9 +2,10 @@
 WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
-COPY ["src/Juridical.Core/Juridical.Core.csproj", "src/Juridical.Core/"]
-COPY ["src/Juridical.Message.Worker/Juridical.Message.Worker.csproj", "src/Juridical.Message.Worker/"]
-RUN dotnet restore "src/Juridical.Message.Worker/Juridical.Message.Worker.csproj"
+WORKDIR /src
+COPY ["Juridical.Core/Juridical.Core.csproj", "Juridical.Core/"]
+COPY ["Juridical.Message.Worker/Juridical.Message.Worker.csproj", "Juridical.Message.Worker/"]
+RUN dotnet restore "Juridical.Message.Worker/Juridical.Message.Worker.csproj"
 COPY . .
 WORKDIR "/src/Juridical.Message.Worker"
 RUN dotnet build "Juridical.Message.Worker.csproj" -c Release -o /app/build
