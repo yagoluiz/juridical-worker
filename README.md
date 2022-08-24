@@ -37,7 +37,7 @@ dotnet user-secrets set "MESSAGE_SERVICE_FROM" "YOUR_SECRET"
 dotnet user-secrets set "MESSAGE_SERVICE_TO" "YOUR_SECRET"
 ```
 
-### Docker and Kubernetes
+### Docker
 
 - Create **.env** file
 
@@ -59,10 +59,14 @@ MESSAGE_SERVICE_TO=YOUR_SECRET
 docker run -d -p 4444:4444 -p 7900:7900 --shm-size="2g" -e VNC_NO_PASSWORD=1 --name selenium selenium/standalone-chrome:4.1.1-20220121
 ```
 
-2) Run project:
+2) Run projects:
 
 ```bash
-src/Juridical.Worker && dotnet watch run
+src/Juridical.LegalProcess.Worker && dotnet watch run
+```
+
+```bash
+src/Juridical.Message.Worker && dotnet watch run
 ```
 
 ### Docker
@@ -73,7 +77,7 @@ src/Juridical.Worker && dotnet watch run
 docker-compose up -d
 ```
 
-### Kubernetes
+### Push images (optional)
 
 - Create [Container Registry (GCP)](https://cloud.google.com/container-registry/docs/pushing-and-pulling)
 
@@ -92,55 +96,21 @@ gcloud auth configure-docker
 3) Push images for private registry:
 
 ```bash
-docker build -t juridical/juridical-legal-process-worker:v1 .
-docker tag juridical/juridical-legal-process-worker:v1 gcr.io/$PROJECT_ID/juridical-legal-process-worker:v1
+docker build \
+  -f ./src/Juridical.LegalProcess.Worker/Dockerfile \
+  -t juridical/juridical-legal-process-worker:v1 \
+  ./src/ &&
+docker tag juridical/juridical-legal-process-worker:v1 gcr.io/$PROJECT_ID/juridical-legal-process-worker:v1 &&
 docker push gcr.io/$PROJECT_ID/juridical-legal-process-worker:v1
 ```
 
 ```bash
-docker build -t juridical/juridical-message-worker:v1 .
-docker tag juridical/juridical-message-worker:v1 gcr.io/$PROJECT_ID/juridical-message-worker:v1
+docker build \
+  -f ./src/Juridical.Message.Worker/Dockerfile \
+  -t juridical/juridical-message-worker:v1 \
+  ./src/ &&
+docker tag juridical/juridical-message-worker:v1 gcr.io/$PROJECT_ID/juridical-message-worker:v1 &&
 docker push gcr.io/$PROJECT_ID/juridical-message-worker:v1
-```
-
-4) Set image *juridical-legal-process-worker-deployment.yaml* file:
-
-```yaml
-...
-containers:
-  - name: juridical-worker
-    image: gcr.io/PROJECT_ID/LEGAL_PROCESS_IMAGE:TAG
-...
-```
-
-5) Set image *juridical-message-deployment.yaml* file:
-
-```yaml
-...
-containers:
-  - name: juridical-worker
-    image: gcr.io/PROJECT_ID/MESSAGE_IMAGE:TAG
-...
-```
-
-- Run minikube
-
-1) Start cluster:
-
-```bash
-minikube start
-```
-
-2) Run k8s files:
-
-```bash
-sh local-deploy.sh
-```
-
-3) (Optional) Open dashboard:
-
-```bash
-minikube dashboard
 ```
 
 ## Infrastructure
