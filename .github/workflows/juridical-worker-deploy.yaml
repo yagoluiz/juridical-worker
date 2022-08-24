@@ -63,8 +63,8 @@ jobs:
     name: Terraform
     runs-on: ubuntu-latest
 
-    needs: [ build ]
-#    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' }}
+    needs: [build]
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' }}
 
     steps:
       - name: Checkout
@@ -99,18 +99,18 @@ jobs:
     name: GCR Deploy
     runs-on: ubuntu-latest
 
-    needs: [ terraform ]
-#    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' }}
+    needs: [terraform]
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' }}
 
     permissions:
-      contents: read
-      id-token: write
+      contents: "read"
+      id-token: "write"
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - id: auth
+      - id: "auth"
         name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v0
         with:
@@ -131,7 +131,7 @@ jobs:
             -t "gcr.io/$PROJECT_ID/$GCR_LEGAL_PROCESS_IMAGE:$GITHUB_SHA-${{ env.GCR_IMAGE_ID }}" \
             -t "gcr.io/$PROJECT_ID/$GCR_LEGAL_PROCESS_IMAGE:latest" \
             ./src/
-
+          
       - name: Docker build - ${{ env.GCR_MESSAGE_IMAGE }}
         run: |-
           docker build \
@@ -149,25 +149,25 @@ jobs:
     name: GKE Deploy
     runs-on: ubuntu-latest
 
-    needs: [ gcr-deploy ]
-#    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' }}
+    needs: [gcr-deploy]
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' }}
 
     permissions:
-      contents: read
-      id-token: write
+      contents: "read"
+      id-token: "write"
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - id: auth
+      - id: "auth"
         name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v0
         with:
           workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ env.JURIDICAL_SERVICE_ACCOUNT }}
 
-      - id: get-credentials
+      - id: "get-credentials"
         name: Authenticate to GKE
         uses: google-github-actions/get-gke-credentials@v0
         with:
