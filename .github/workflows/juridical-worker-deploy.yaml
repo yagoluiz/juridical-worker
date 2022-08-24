@@ -198,14 +198,10 @@ jobs:
           curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
           chmod u+x ./kustomize
 
-      - name: Deploy k8s - ${{ env.GCR_LEGAL_PROCESS_IMAGE }}
+      - name: Deploy k8s
         run: |-
           ./kustomize edit set image gcr.io/PROJECT_ID/LEGAL_PROCESS_IMAGE:TAG=gcr.io/$PROJECT_ID/$LEGAL_PROCESS_IMAGE:$GITHUB_SHA-${{ env.GCR_IMAGE_ID }}
-          ./kustomize build . | kubectl apply -f -
-          kubectl rollout status deployment juridical-legal-process-worker -n ${{ env.K8S_NAMESPACE }}
-
-      - name: Deploy k8s - ${{ env.GCR_MESSAGE_IMAGE }}
-        run: |-
           ./kustomize edit set image gcr.io/PROJECT_ID/MESSAGE_IMAGE:TAG=gcr.io/$PROJECT_ID/$MESSAGE_IMAGE:$GITHUB_SHA-${{ env.GCR_IMAGE_ID }}
           ./kustomize build . | kubectl apply -f -
+          kubectl rollout status deployment juridical-legal-process-worker -n ${{ env.K8S_NAMESPACE }}
           kubectl rollout status deployment juridical-message-worker -n ${{ env.K8S_NAMESPACE }}
