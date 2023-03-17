@@ -1,6 +1,8 @@
 name: juridical-worker-deploy
 
 on:
+  workflow_dispatch:
+
   pull_request:
     branches:
       - main
@@ -12,13 +14,13 @@ on:
     paths-ignore:
       - "**/README.md"
 
-  workflow_dispatch:
-
 env:
-  DOTNET_VERSION: 6.0.x
+  DOTNET_VERSION: 7.0.x
   GCR_LEGAL_PROCESS_IMAGE: juridical-legal-process-worker
   GCR_MESSAGE_IMAGE: juridical-message-worker
   GCR_IMAGE_ID: $GITHUB_RUN_ATTEMPT
+  GKE_CLUSTER: juridical-cluster
+  GKE_ZONE: us-east1-b
   K8S_NAMESPACE: juridical
   K8S_LEGAL_PROCESS_SECRET: juridical-legal-process-secret
   K8S_MESSAGE_SECRET: juridical-message-secret
@@ -27,8 +29,6 @@ env:
   WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
   JURIDICAL_SERVICE_ACCOUNT: ${{ secrets.JURIDICAL_SERVICE_ACCOUNT }}
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
-  GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
-  GKE_ZONE: ${{ secrets.GKE_ZONE }}
 
   K8S_LEGAL_PROCESS_USER: ${{ secrets.K8S_LEGAL_PROCESS_USER }}
   K8S_LEGAL_PROCESS_PASSWORD: ${{ secrets.K8S_LEGAL_PROCESS_PASSWORD }}
@@ -128,7 +128,7 @@ jobs:
             -t "gcr.io/$PROJECT_ID/$GCR_LEGAL_PROCESS_IMAGE:$GITHUB_SHA-${{ env.GCR_IMAGE_ID }}" \
             -t "gcr.io/$PROJECT_ID/$GCR_LEGAL_PROCESS_IMAGE:latest" \
             ./src/
-          
+
       - name: Docker build - ${{ env.GCR_MESSAGE_IMAGE }}
         run: |-
           docker build \
@@ -175,6 +175,11 @@ jobs:
         run: |-
           kubectl apply -f k8s/namespaces/juridical-namespace.yaml
 
+      - name: Create juridical config maps
+        run: |-
+          kubectl apply -f k8s/configs/juridical-legal-process-worker-config-map.yaml && \
+          kubectl apply -f k8s/configs/juridical-message-worker-config-map.yaml
+
       - name: Delete k8s secrets
         run: |-
           kubectl delete secret ${{ env.K8S_LEGAL_PROCESS_SECRET }} -n ${{ env.K8S_NAMESPACE }} --ignore-not-found && \
@@ -183,12 +188,14 @@ jobs:
       - name: Create k8s secret - ${{ env.K8S_LEGAL_PROCESS_SECRET }}
         run: |-
           kubectl create secret generic ${{ env.K8S_LEGAL_PROCESS_SECRET }} -n ${{ env.K8S_NAMESPACE }} \
+            --from-literal=PROJECT_ID='${{ env.PROJECT_ID }}' \
             --from-literal=LEGAL_PROCESS_USER='${{ env.K8S_LEGAL_PROCESS_USER }}' \
-            --from-literal=LEGAL_PROCESS_PASSWORD='${{ env.K8S_LEGAL_PROCESS_PASSWORD }}' \
+            --from-literal=LEGAL_PROCESS_PASSWORD='${{ env.K8S_LEGAL_PROCESS_PASSWORD }}'
 
       - name: Create k8s secrets - ${{ env.K8S_MESSAGE_SECRET }}
         run: |-
           kubectl create secret generic ${{ env.K8S_MESSAGE_SECRET }} -n ${{ env.K8S_NAMESPACE }} \
+            --from-literal=PROJECT_ID='${{ env.PROJECT_ID }}' \
             --from-literal=MESSAGE_SERVICE_API_TOKEN='${{ env.K8S_MESSAGE_SERVICE_API_TOKEN }}' \
             --from-literal=MESSAGE_SERVICE_FROM='${{ env.K8S_MESSAGE_SERVICE_FROM }}' \
             --from-literal=MESSAGE_SERVICE_TO='${{ env.K8S_MESSAGE_SERVICE_TO }}'

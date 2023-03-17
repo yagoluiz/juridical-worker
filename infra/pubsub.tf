@@ -1,30 +1,21 @@
-resource "google_pubsub_topic" "juridical-topic" {
-  name = "juridical-sms-topic"
-
-  labels = {
-    foo = "sms"
-  }
+resource "google_pubsub_topic" "juridical-process-topic" {
+  name = "juridical.legal-process.resulted"
 }
 
-resource "google_pubsub_subscription" "juridical-subscription" {
-  name  = "juridical-sms-subscription"
-  topic = google_pubsub_topic.juridical-topic.name
+resource "google_pubsub_subscription" "juridical-message-subscription" {
+  name  = "juridical.message.sended"
+  topic = google_pubsub_topic.juridical-process-topic.name
 
-  labels = {
-    foo = "sms"
-  }
-
-  # 20 minutes
-  message_retention_duration = "1200s"
-  retain_acked_messages      = true
-
-  ack_deadline_seconds = 20
+  message_retention_duration = "604800s"
+  ack_deadline_seconds       = 60
 
   expiration_policy {
-    ttl = "300000.5s"
+    ttl = ""
   }
+
   retry_policy {
     minimum_backoff = "10s"
+    maximum_backoff = "600s"
   }
 
   enable_message_ordering = true

@@ -14,12 +14,9 @@ spec:
       containers:
         - name: juridical-legal-process-worker
           image: gcr.io/PROJECT_ID/LEGAL_PROCESS_IMAGE:TAG
-          env:
-            - name: ASPNETCORE_ENVIRONMENT
-              value: Production
-            - name: Logging__Console__FormatterName
-              value: ""
           envFrom:
+            - configMapRef:
+                name: juridical-legal-process-config-map
             - secretRef:
                 name: juridical-legal-process-secret
       restartPolicy: Always

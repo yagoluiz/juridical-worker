@@ -1,4 +1,4 @@
-namespace Juridical.Core.Models;
+namespace Juridical.Core.Models.Builders;
 
 public class LegalProcess
 {

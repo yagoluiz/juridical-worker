@@ -14,12 +14,9 @@ spec:
       containers:
         - name: juridical-message-worker
           image: gcr.io/PROJECT_ID/MESSAGE_IMAGE:TAG
-          env:
-            - name: ASPNETCORE_ENVIRONMENT
-              value: Production
-            - name: Logging__Console__FormatterName
-              value: ""
           envFrom:
+            - configMapRef:
+                name: juridical-message-config-map
             - secretRef:
                 name: juridical-message-secret
       restartPolicy: Always

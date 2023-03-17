@@ -42,6 +42,9 @@ dotnet user-secrets set "MESSAGE_SERVICE_TO" "YOUR_SECRET"
 - Create **.env** file
 
 ```bash
+PROJECT_ID=juridical-test
+PUBSUB_EMULATOR_HOST=127.0.0.1:8085
+WEB_DRIVER_URI=http://juridical-selenium:4444/wd/hub
 LEGAL_PROCESS_USER=YOUR_SECRET
 LEGAL_PROCESS_PASSWORD=YOUR_SECRET
 MESSAGE_SERVICE_API_TOKEN=YOUR_SECRET
@@ -51,22 +54,40 @@ MESSAGE_SERVICE_TO=YOUR_SECRET
 
 ## Instructions for run project
 
+### Pub/Sub Emulator
+
+1) Run pub/sub emulator:
+
+```bash
+cd emulators/ && docker-compose up -d
+```
+
+2) Publish message:
+
+```bash
+docker exec -it juridical-pubsub-emulator /bin/bash
+```
+
+```bash
+python3 /root/bin/pubsub-client.py publish ${PUBSUB_PROJECT_ID} juridical.legal-process.resulted '{ "ProcessCount": 1 }'
+```
+
 ### .NET
 
 1) Run selenium:
 
 ```bash
-docker run -d -p 4444:4444 -p 7900:7900 --shm-size="2g" -e VNC_NO_PASSWORD=1 --name selenium selenium/standalone-chrome:4.1.1-20220121
+docker run -d -p 4444:4444 -p 7900:7900 --shm-size="2g" -e VNC_NO_PASSWORD=1 --name selenium selenium/standalone-chrome:110.0
 ```
 
 2) Run projects:
 
 ```bash
-src/Juridical.LegalProcess.Worker && dotnet watch run
+cd src/Juridical.LegalProcess.Worker && dotnet watch run
 ```
 
 ```bash
-src/Juridical.Message.Worker && dotnet watch run
+cd src/Juridical.Message.Worker && dotnet watch run
 ```
 
 ### Docker
@@ -155,7 +176,7 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
 	--role=roles/iam.serviceAccountUser
 gcloud projects add-iam-policy-binding $PROJECT_ID \
 	--member=serviceAccount:$SERVICE_ACCOUNT_EMAIL \
-	--role=roles/viewer \
+	--role=roles/viewer
 gcloud projects add-iam-policy-binding $PROJECT_ID \
 	--member=serviceAccount:$SERVICE_ACCOUNT_EMAIL \
 	--role=roles/pubsub.admin
@@ -172,7 +193,7 @@ export GOOGLE_CREDENTIALS=~/.config/gcloud/CREDENTIALS_FILE_NAME.json
 2) Execute init:
 
 ```bash
-infra/ && terraform init
+cd infra/ && terraform init
 ```
 
 3) Execute apply:
@@ -237,6 +258,9 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
 gcloud projects add-iam-policy-binding $PROJECT_ID \
 	--member=serviceAccount:$SERVICE_ACCOUNT_EMAIL \
 	--role=roles/stackdriver.resourceMetadata.writer
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+	--member=serviceAccount:$SERVICE_ACCOUNT_EMAIL \
+	--role=roles/pubsub.admin
 ```
 
 - Enabling keyless authentication from [GitHub Actions GCP](https://cloud.google.com/blog/products/identity-security/enabling-keyless-authentication-from-github-actions)

@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: juridical-message-config-map
+  namespace: juridical
+
+data:
+  DOTNET_ENVIRONMENT: "Production"

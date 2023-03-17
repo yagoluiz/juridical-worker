@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  pubsub-emulator:
+    container_name: juridical-pubsub-emulator
+    build:
+      context: .
+      dockerfile: pubsub-emulator.Dockerfile
+    ports:
+      - "8085:8085"
+    environment:
+      PUBSUB_PROJECT_ID: juridical-test
+      PUBSUB_CONFIG: '[{"name": "juridical.legal-process.resulted", "subscriptions": ["juridical.message.sended"]}]'
+      PUBSUB_EMULATOR_HOST: 127.0.0.1:8085
+    volumes:
+      - pubsub-emulator-volume:/data
+    networks:
+      - pubsub-emulator-network
+
+volumes:
+  pubsub-emulator-volume:
+    name: pubsub-emulator-volume
+    driver: local
+
+networks:
+  pubsub-emulator-network:
+    name: pubsub-emulator-network
+    driver: bridge

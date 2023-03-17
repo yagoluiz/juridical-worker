@@ -3,7 +3,10 @@ version: "3.9"
 services:
   juridical-selenium:
     container_name: juridical-selenium
-    image: selenium/standalone-chrome:4.1.1-20220121
+    hostname: juridical-selenium
+    image: selenium/standalone-chrome:110.0
+    privileged: true
+    shm_size: 2g
     ports:
       - "4444:4444"
     expose:
@@ -21,10 +24,7 @@ services:
     env_file:
       - .env
     environment:
-      - DOTNET_ENVIRONMENT=Production
-      - LEGAL_PROCESS_USER
-      - LEGAL_PROCESS_PASSWORD
-      - Logging__Console__FormatterName=""
+      - DOTNET_ENVIRONMENT=Development
     networks:
       - worker-network
     depends_on:
@@ -40,11 +40,7 @@ services:
     env_file:
       - .env
     environment:
-      - DOTNET_ENVIRONMENT=Production
-      - MESSAGE_SERVICE_API_TOKEN
-      - MESSAGE_SERVICE_TO
-      - MESSAGE_SERVICE_FROM
-      - Logging__Console__FormatterName=""
+      - DOTNET_ENVIRONMENT=Development
     networks:
       - worker-network
     restart: always

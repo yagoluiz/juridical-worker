@@ -1,4 +1,4 @@
-using Juridical.Core.Models;
+using Juridical.Core.Models.Builders;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Remote;

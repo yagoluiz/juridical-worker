@@ -7,8 +7,9 @@ resource "google_container_cluster" "juridical-cluster" {
 }
 
 resource "google_container_node_pool" "juridical-node-pool" {
-  name       = "juridical-node-pool"
-  location   = var.zone
+  name     = "juridical-node-pool"
+  location = var.zone
+
   cluster    = google_container_cluster.juridical-cluster.name
   node_count = 1
 
