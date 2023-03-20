@@ -1,0 +1,13 @@
+﻿{
+  "profiles": {
+    "Juridical.LegalProcess.Worker": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development",
+        "PROJECT_ID": "juridical-test",
+        "PUBSUB_EMULATOR_HOST": "127.0.0.1:8085"
+      }
+    }
+  }
+}

@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: juridical-selenium
-          image: selenium/standalone-chrome:4.1.1-20220121
+          image: selenium/standalone-chrome:110.0
           ports:
             - containerPort: 4444
       restartPolicy: Always

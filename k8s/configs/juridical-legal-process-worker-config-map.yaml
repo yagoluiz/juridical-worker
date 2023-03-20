@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: juridical-legal-process-config-map
+  namespace: juridical
+
+data:
+  DOTNET_ENVIRONMENT: "Production"
+  INIT_ACTIVE_IN_HOURS: "5"
+  LEGAL_PROCESS_EXECUTE_IN_MILLISECONDS: "300000"
+  MESSAGE_SERVICE_ACTIVE: "true"

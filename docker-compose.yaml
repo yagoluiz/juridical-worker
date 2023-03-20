@@ -3,7 +3,10 @@ version: "3.9"
 services:
   juridical-selenium:
     container_name: juridical-selenium
-    image: selenium/standalone-chrome:4.1.1-20220121
+    hostname: juridical-selenium
+    image: selenium/standalone-chrome:110.0
+    privileged: true
+    shm_size: 2g
     ports:
       - "4444:4444"
     expose:
@@ -12,26 +15,34 @@ services:
       - worker-network
     restart: always
   
-  juridical-worker:
-    container_name: juridical-worker
-    image: juridical-worker
+  juridical-legal-process-worker:
+    container_name: juridical-legal-process-worker
+    image: juridical-legal-process-worker
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ./src
+      dockerfile: Juridical.LegalProcess.Worker/Dockerfile
     env_file:
       - .env
     environment:
-      - DOTNET_ENVIRONMENT=Production
-      - LEGAL_PROCESS_USER
-      - LEGAL_PROCESS_PASSWORD
-      - MESSAGE_SERVICE_API_TOKEN
-      - MESSAGE_SERVICE_TO
-      - MESSAGE_SERVICE_FROM
-      - Logging__Console__FormatterName=""
+      - DOTNET_ENVIRONMENT=Development
     networks:
       - worker-network
     depends_on:
       - juridical-selenium
+    restart: always
+
+  juridical-message-worker:
+    container_name: juridical-message-worker
+    image: juridical-message-worker
+    build:
+      context: ./src
+      dockerfile: Juridical.Message.Worker/Dockerfile
+    env_file:
+      - .env
+    environment:
+      - DOTNET_ENVIRONMENT=Development
+    networks:
+      - worker-network
     restart: always
 
 networks:

@@ -5,7 +5,11 @@ VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2FCF4C2E-50A5-40ED-A01B-858E0F72386F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Juridical.Worker", "src\Juridical.Worker\Juridical.Worker.csproj", "{5A36A35E-FFE7-4C4E-875B-F2EBFBD9E1B7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Juridical.LegalProcess.Worker", "src\Juridical.LegalProcess.Worker\Juridical.LegalProcess.Worker.csproj", "{5A36A35E-FFE7-4C4E-875B-F2EBFBD9E1B7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Juridical.Core", "src\Juridical.Core\Juridical.Core.csproj", "{310B586A-32DE-4DC7-80E3-C74A8D7506AD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Juridical.Message.Worker", "src\Juridical.Message.Worker\Juridical.Message.Worker.csproj", "{6A0F9C0A-0682-4798-9134-A93DDB340A57}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,6 +24,14 @@ Global
 		{5A36A35E-FFE7-4C4E-875B-F2EBFBD9E1B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A36A35E-FFE7-4C4E-875B-F2EBFBD9E1B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5A36A35E-FFE7-4C4E-875B-F2EBFBD9E1B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{310B586A-32DE-4DC7-80E3-C74A8D7506AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{310B586A-32DE-4DC7-80E3-C74A8D7506AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{310B586A-32DE-4DC7-80E3-C74A8D7506AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{310B586A-32DE-4DC7-80E3-C74A8D7506AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A0F9C0A-0682-4798-9134-A93DDB340A57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A0F9C0A-0682-4798-9134-A93DDB340A57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A0F9C0A-0682-4798-9134-A93DDB340A57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A0F9C0A-0682-4798-9134-A93DDB340A57}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{5A36A35E-FFE7-4C4E-875B-F2EBFBD9E1B7} = {2FCF4C2E-50A5-40ED-A01B-858E0F72386F}

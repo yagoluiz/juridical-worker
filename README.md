@@ -4,35 +4,47 @@
 
 Worker responsible for identify legal process.
 
-## Environment settings
+## Environment settings local
 
 ### .NET
 
 - Use [dotnet user-secrets](https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets)
 
-1) Get project folder:
+1) Get project folder legal process worker:
 
 ```bash
-src/Juridical.Worker
+src/Juridical.LegalProcess.Worker
 ```
 
 2) Create secrets:
 
 ```bash
-dotnet user-secrets set "WORKER_ACTIVE" "YOUR_SECRET"
 dotnet user-secrets set "LEGAL_PROCESS_USER" "YOUR_SECRET"
 dotnet user-secrets set "LEGAL_PROCESS_PASSWORD" "YOUR_SECRET"
+```
+
+1) Get project folder message worker:
+
+```bash
+src/Juridical.Message.Worker
+```
+
+2) Create secrets:
+
+```bash
 dotnet user-secrets set "MESSAGE_SERVICE_API_TOKEN" "YOUR_SECRET"
 dotnet user-secrets set "MESSAGE_SERVICE_FROM" "YOUR_SECRET"
 dotnet user-secrets set "MESSAGE_SERVICE_TO" "YOUR_SECRET"
 ```
 
-### Docker and Kubernetes
+### Docker
 
 - Create **.env** file
 
 ```bash
-WORKER_ACTIVE=YOUR_SECRET
+PROJECT_ID=juridical-test
+PUBSUB_EMULATOR_HOST=127.0.0.1:8085
+WEB_DRIVER_URI=http://juridical-selenium:4444/wd/hub
 LEGAL_PROCESS_USER=YOUR_SECRET
 LEGAL_PROCESS_PASSWORD=YOUR_SECRET
 MESSAGE_SERVICE_API_TOKEN=YOUR_SECRET
@@ -42,18 +54,40 @@ MESSAGE_SERVICE_TO=YOUR_SECRET
 
 ## Instructions for run project
 
+### Pub/Sub Emulator
+
+1) Run pub/sub emulator:
+
+```bash
+cd emulators/ && docker-compose up -d
+```
+
+2) Publish message:
+
+```bash
+docker exec -it juridical-pubsub-emulator /bin/bash
+```
+
+```bash
+python3 /root/bin/pubsub-client.py publish ${PUBSUB_PROJECT_ID} juridical.legal-process.resulted '{ "ProcessCount": 1 }'
+```
+
 ### .NET
 
 1) Run selenium:
 
 ```bash
-docker run -d -p 4444:4444 -p 7900:7900 --shm-size="2g" -e VNC_NO_PASSWORD=1 --name selenium selenium/standalone-chrome:4.1.1-20220121
+docker run -d -p 4444:4444 -p 7900:7900 --shm-size="2g" -e VNC_NO_PASSWORD=1 --name selenium selenium/standalone-chrome:110.0
 ```
 
-2) Run project:
+2) Run projects:
 
 ```bash
-src/Juridical.Worker && dotnet watch run
+cd src/Juridical.LegalProcess.Worker && dotnet watch run
+```
+
+```bash
+cd src/Juridical.Message.Worker && dotnet watch run
 ```
 
 ### Docker
@@ -64,7 +98,7 @@ src/Juridical.Worker && dotnet watch run
 docker-compose up -d
 ```
 
-### Kubernetes
+### Push images (optional)
 
 - Create [Container Registry (GCP)](https://cloud.google.com/container-registry/docs/pushing-and-pulling)
 
@@ -80,42 +114,24 @@ gcloud auth login
 gcloud auth configure-docker
 ```
 
-3) Push image for private registry:
+3) Push images for private registry:
 
 ```bash
-docker build -t juridical/juridical-worker:v1 .
-docker tag juridical/juridical-worker:v1 gcr.io/$PROJECT_ID/juridical-worker:v1
-docker push gcr.io/$PROJECT_ID/juridical-worker:v1
+docker build \
+  -f ./src/Juridical.LegalProcess.Worker/Dockerfile \
+  -t juridical/juridical-legal-process-worker:v1 \
+  ./src/ &&
+docker tag juridical/juridical-legal-process-worker:v1 gcr.io/$PROJECT_ID/juridical-legal-process-worker:v1 &&
+docker push gcr.io/$PROJECT_ID/juridical-legal-process-worker:v1
 ```
-
-4) Set image *juridical-worker-deployment.yaml* file:
-
-```yaml
-...
-containers:
-  - name: juridical-worker
-    image: gcr.io/PROJECT_ID/IMAGE:TAG
-...
-```
-
-- Run minikube
-
-1) Start cluster:
 
 ```bash
-minikube start
-```
-
-2) Run k8s files:
-
-```bash
-sh local-deploy.sh
-```
-
-3) (Optional) Open dashboard:
-
-```bash
-minikube dashboard
+docker build \
+  -f ./src/Juridical.Message.Worker/Dockerfile \
+  -t juridical/juridical-message-worker:v1 \
+  ./src/ &&
+docker tag juridical/juridical-message-worker:v1 gcr.io/$PROJECT_ID/juridical-message-worker:v1 &&
+docker push gcr.io/$PROJECT_ID/juridical-message-worker:v1
 ```
 
 ## Infrastructure
@@ -161,6 +177,9 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
 gcloud projects add-iam-policy-binding $PROJECT_ID \
 	--member=serviceAccount:$SERVICE_ACCOUNT_EMAIL \
 	--role=roles/viewer
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+	--member=serviceAccount:$SERVICE_ACCOUNT_EMAIL \
+	--role=roles/pubsub.admin
 ```
 
 - Run local infrastructure
@@ -174,7 +193,7 @@ export GOOGLE_CREDENTIALS=~/.config/gcloud/CREDENTIALS_FILE_NAME.json
 2) Execute init:
 
 ```bash
-infra/ && terraform init
+cd infra/ && terraform init
 ```
 
 3) Execute apply:
@@ -239,6 +258,9 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
 gcloud projects add-iam-policy-binding $PROJECT_ID \
 	--member=serviceAccount:$SERVICE_ACCOUNT_EMAIL \
 	--role=roles/stackdriver.resourceMetadata.writer
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+	--member=serviceAccount:$SERVICE_ACCOUNT_EMAIL \
+	--role=roles/pubsub.admin
 ```
 
 - Enabling keyless authentication from [GitHub Actions GCP](https://cloud.google.com/blog/products/identity-security/enabling-keyless-authentication-from-github-actions)

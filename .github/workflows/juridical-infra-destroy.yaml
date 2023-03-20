@@ -9,8 +9,8 @@ defaults:
 
 env:
   TERRAFORM_CREDENTIALS: ${{ secrets.TERRAFORM_CREDENTIALS }}
-  PROJECT_ID: ${{ secrets.PROJECT_ID }}
   JURIDICAL_SERVICE_ACCOUNT: ${{ secrets.JURIDICAL_SERVICE_ACCOUNT }}
+  PROJECT_ID: ${{ secrets.PROJECT_ID }}
 
 jobs:
   terraform:
@@ -19,22 +19,25 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup
-        uses: hashicorp/setup-terraform@v1
+        uses: hashicorp/setup-terraform@v2
 
       - name: Init
+        working-directory: infra
         run: terraform init
         env:
           GOOGLE_CREDENTIALS: ${{ env.TERRAFORM_CREDENTIALS }}
 
       - name: Validate
+        working-directory: infra
         run: terraform validate
         env:
           GOOGLE_CREDENTIALS: ${{ env.TERRAFORM_CREDENTIALS }}
 
       - name: Destroy
+        working-directory: infra
         run: |-
           terraform destroy \
             -var="project_id=${{ env.PROJECT_ID }}" \

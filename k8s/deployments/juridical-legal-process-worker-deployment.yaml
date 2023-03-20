@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: juridical-legal-process-worker
+  namespace: juridical
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: juridical-legal-process-worker
+    spec:
+      containers:
+        - name: juridical-legal-process-worker
+          image: gcr.io/PROJECT_ID/LEGAL_PROCESS_IMAGE:TAG
+          envFrom:
+            - configMapRef:
+                name: juridical-legal-process-config-map
+            - secretRef:
+                name: juridical-legal-process-secret
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: juridical-legal-process-worker
