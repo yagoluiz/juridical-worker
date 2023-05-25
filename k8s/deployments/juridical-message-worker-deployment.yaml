@@ -19,6 +19,22 @@ spec:
                 name: juridical-message-config-map
             - secretRef:
                 name: juridical-message-secret
+          livenessProbe:
+            httpGet:
+              path: /health/liveness
+              port: 5001
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            timeoutSeconds: 25
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health/readiness
+              port: 5001
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            timeoutSeconds: 25
+            failureThreshold: 3
       restartPolicy: Always
   selector:
     matchLabels:
