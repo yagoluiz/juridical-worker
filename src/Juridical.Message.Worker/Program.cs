@@ -1,3 +1,4 @@
+using Juridical.Core.HealthChecks;
 using Juridical.Core.Interfaces;
 using Juridical.Core.Services;
 using Juridical.Message.Worker.Subscribers;
@@ -14,6 +15,7 @@ var host = Host.CreateDefaultBuilder(args)
                 context.Configuration.GetValue<string>("MESSAGE_SERVICE_API_TOKEN"));
         });
         services.AddHostedService<MessageWorker>();
+        services.AddHostedService<HealthCheckWorker>();
     })
     .Build();
 
