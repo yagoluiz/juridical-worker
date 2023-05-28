@@ -170,6 +170,9 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
 	--role=roles/storage.admin
 gcloud projects add-iam-policy-binding $PROJECT_ID \
 	--member=serviceAccount:$SERVICE_ACCOUNT_EMAIL \
+	--role=roles/artifactregistry.admin
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+	--member=serviceAccount:$SERVICE_ACCOUNT_EMAIL \
 	--role=roles/container.admin
 gcloud projects add-iam-policy-binding $PROJECT_ID \
 	--member=serviceAccount:$SERVICE_ACCOUNT_EMAIL \
@@ -246,6 +249,9 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
 gcloud projects add-iam-policy-binding $PROJECT_ID \
 	--member=serviceAccount:$SERVICE_ACCOUNT_EMAIL \
 	--role=roles/storage.admin
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+	--member=serviceAccount:$SERVICE_ACCOUNT_EMAIL \
+	--role=roles/artifactregistry.admin
 gcloud projects add-iam-policy-binding $PROJECT_ID \
 	--member=serviceAccount:$SERVICE_ACCOUNT_EMAIL \
 	--role=roles/container.clusterViewer

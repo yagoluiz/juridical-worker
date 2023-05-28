@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: juridical-message-worker
-          image: gcr.io/PROJECT_ID/MESSAGE_IMAGE:TAG
+          image: us-east1-docker.pkg.dev/MESSAGE_IMAGE:TAG
           envFrom:
             - configMapRef:
                 name: juridical-message-config-map
