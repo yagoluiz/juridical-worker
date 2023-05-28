@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: juridical-legal-process-worker
-          image: gcr.io/PROJECT_ID/LEGAL_PROCESS_IMAGE:TAG
+          image: us-east1-docker.pkg.dev/LEGAL_PROCESS_IMAGE:TAG
           envFrom:
             - configMapRef:
                 name: juridical-legal-process-config-map

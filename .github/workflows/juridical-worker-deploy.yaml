@@ -16,9 +16,9 @@ on:
 
 env:
   DOTNET_VERSION: 7.0.x
-  GCR_LEGAL_PROCESS_IMAGE: juridical-legal-process-worker
-  GCR_MESSAGE_IMAGE: juridical-message-worker
-  GCR_IMAGE_ID: $GITHUB_RUN_ATTEMPT
+  LEGAL_PROCESS_IMAGE: juridical-legal-process-worker
+  MESSAGE_IMAGE: juridical-message-worker
+  IMAGE_ID: $GITHUB_RUN_ATTEMPT
   GKE_CLUSTER: juridical-cluster
   GKE_ZONE: us-east1-b
   K8S_NAMESPACE: juridical
@@ -92,8 +92,8 @@ jobs:
         env:
           GOOGLE_CREDENTIALS: ${{ env.TERRAFORM_CREDENTIALS }}
 
-  gcr-deploy:
-    name: GCR Deploy
+  artifact-deploy:
+    name: Artifact Registry Deploy
     runs-on: ubuntu-latest
 
     needs: [terraform]
@@ -119,34 +119,34 @@ jobs:
 
       - name: Docker configuration
         run: |-
-          gcloud --quiet auth configure-docker
+          gcloud auth configure-docker us-east1-docker.pkg.dev --quiet
 
-      - name: Docker build - ${{ env.GCR_LEGAL_PROCESS_IMAGE }}
+      - name: Docker build - ${{ env.LEGAL_PROCESS_IMAGE }}
         run: |-
           docker build \
             -f ./src/Juridical.LegalProcess.Worker/Dockerfile \
-            -t "gcr.io/$PROJECT_ID/$GCR_LEGAL_PROCESS_IMAGE:$GITHUB_SHA-${{ env.GCR_IMAGE_ID }}" \
-            -t "gcr.io/$PROJECT_ID/$GCR_LEGAL_PROCESS_IMAGE:latest" \
+            -t "us-east1-docker.pkg.dev/$PROJECT_ID/juridical/$LEGAL_PROCESS_IMAGE:$GITHUB_SHA-${{ env.IMAGE_ID }}" \
+            -t "us-east1-docker.pkg.dev/$PROJECT_ID/juridical/$LEGAL_PROCESS_IMAGE:latest" \
             ./src/
 
-      - name: Docker build - ${{ env.GCR_MESSAGE_IMAGE }}
+      - name: Docker build - ${{ env.MESSAGE_IMAGE }}
         run: |-
           docker build \
             -f ./src/Juridical.Message.Worker/Dockerfile \
-            -t "gcr.io/$PROJECT_ID/$GCR_MESSAGE_IMAGE:$GITHUB_SHA-${{ env.GCR_IMAGE_ID }}" \
-            -t "gcr.io/$PROJECT_ID/$GCR_MESSAGE_IMAGE:latest" \
+            -t "us-east1-docker.pkg.dev/$PROJECT_ID/juridical/$MESSAGE_IMAGE:$GITHUB_SHA-${{ env.IMAGE_ID }}" \
+            -t "us-east1-docker.pkg.dev/$PROJECT_ID/juridical/$MESSAGE_IMAGE:latest" \
             ./src/
 
       - name: Docker publish
         run: |-
-          docker push --all-tags "gcr.io/$PROJECT_ID/$GCR_LEGAL_PROCESS_IMAGE" && \
-          docker push --all-tags "gcr.io/$PROJECT_ID/$GCR_MESSAGE_IMAGE"
+          docker push --all-tags "us-east1-docker.pkg.dev/$PROJECT_ID/juridical/$LEGAL_PROCESS_IMAGE" && \
+          docker push --all-tags "us-east1-docker.pkg.dev/$PROJECT_ID/juridical/$MESSAGE_IMAGE"
 
   gke-deploy:
     name: GKE Deploy
     runs-on: ubuntu-latest
 
-    needs: [gcr-deploy]
+    needs: [artifact-deploy]
     if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' }}
 
     permissions:
@@ -207,8 +207,8 @@ jobs:
 
       - name: Deploy k8s
         run: |-
-          ./kustomize edit set image gcr.io/PROJECT_ID/LEGAL_PROCESS_IMAGE:TAG=gcr.io/$PROJECT_ID/$GCR_LEGAL_PROCESS_IMAGE:$GITHUB_SHA-${{ env.GCR_IMAGE_ID }}
-          ./kustomize edit set image gcr.io/PROJECT_ID/MESSAGE_IMAGE:TAG=gcr.io/$PROJECT_ID/$GCR_MESSAGE_IMAGE:$GITHUB_SHA-${{ env.GCR_IMAGE_ID }}
+          ./kustomize edit set image us-east1-docker.pkg.dev/LEGAL_PROCESS_IMAGE:TAG=us-east1-docker.pkg.dev/$PROJECT_ID/juridical/$LEGAL_PROCESS_IMAGE:$GITHUB_SHA-${{ env.IMAGE_ID }}
+          ./kustomize edit set image us-east1-docker.pkg.dev/MESSAGE_IMAGE:TAG=us-east1-docker.pkg.dev/$PROJECT_ID/juridical/$MESSAGE_IMAGE:$GITHUB_SHA-${{ env.IMAGE_ID }}
           ./kustomize build . | kubectl apply -f -
           kubectl rollout status deployment juridical-legal-process-worker -n ${{ env.K8S_NAMESPACE }}
           kubectl rollout status deployment juridical-message-worker -n ${{ env.K8S_NAMESPACE }}
