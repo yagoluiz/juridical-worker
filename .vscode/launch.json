@@ -1,0 +1,37 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "LegalProcess.Worker",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-legal-process-worker",
+            "program": "${workspaceFolder}/src/Juridical.LegalProcess.Worker/bin/Debug/net7.0/Juridical.LegalProcess.Worker.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/src/Juridical.LegalProcess.Worker",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
+            "name": "Message.Worker",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-message-worker",
+            "program": "${workspaceFolder}/src/Juridical.Message.Worker/bin/Debug/net7.0/Juridical.Message.Worker.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/src/Juridical.Message.Worker",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        }
+    ],
+    "compounds": [
+        {
+            "name": "LegalProcess.Worker + Message.Worker",
+            "configurations": [
+                "LegalProcess.Worker",
+                "Message.Worker"
+            ],
+            "stopAll": true
+        }
+    ]
+}

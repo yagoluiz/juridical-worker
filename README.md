@@ -69,7 +69,15 @@ docker exec -it juridical-pubsub-emulator /bin/bash
 ```
 
 ```bash
-python3 /root/bin/pubsub-client.py publish ${PUBSUB_PROJECT_ID} juridical.legal-process.resulted '{ "ProcessCount": 1 }'
+python3 /root/bin/pubsub-client.py publish juridical-test juridical.legal-process.resulted '{
+  "specversion": "1.0",
+  "id": "542204ea-76c7-4b38-a35d-55440bfa3b6a",
+  "type": "Juridical.Core.Events.LegalProcessEvent",
+  "source": "juridical-legal-process-worker",
+  "datacontenttype": "application/json",
+  "time": "2023-06-09T14:58:21.6717314-03:00",
+  "data": "{\"processCount\":1}"
+}'
 ```
 
 ### .NET
@@ -121,8 +129,8 @@ docker build \
   -f ./src/Juridical.LegalProcess.Worker/Dockerfile \
   -t juridical/juridical-legal-process-worker:v1 \
   ./src/ &&
-docker tag juridical/juridical-legal-process-worker:v1 gcr.io/$PROJECT_ID/juridical-legal-process-worker:v1 &&
-docker push gcr.io/$PROJECT_ID/juridical-legal-process-worker:v1
+docker tag juridical/juridical-legal-process-worker:v1 us-east1-docker.pkg.dev/$PROJECT_ID/juridical/juridical-legal-process-worker:v1 &&
+docker push us-east1-docker.pkg.dev/$PROJECT_ID/juridical/juridical-legal-process-worker:v1
 ```
 
 ```bash
@@ -130,8 +138,8 @@ docker build \
   -f ./src/Juridical.Message.Worker/Dockerfile \
   -t juridical/juridical-message-worker:v1 \
   ./src/ &&
-docker tag juridical/juridical-message-worker:v1 gcr.io/$PROJECT_ID/juridical-message-worker:v1 &&
-docker push gcr.io/$PROJECT_ID/juridical-message-worker:v1
+docker tag juridical/juridical-message-worker:v1 us-east1-docker.pkg.dev/$PROJECT_ID/juridical/juridical-message-worker:v1 &&
+docker push us-east1-docker.pkg.dev/$PROJECT_ID/juridical/juridical-message-worker:v1
 ```
 
 ## Infrastructure

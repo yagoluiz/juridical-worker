@@ -44,7 +44,8 @@ public sealed class GooglePubSubSubscriberService : ISubscriberService
                 _logger.LogInformation("GooglePubSubSubscriberService - MessageId: {messageId} - Message: {message}",
                     message.MessageId, message.Data.ToStringUtf8());
 
-                var legalProcessEvent = JsonSerializer.Deserialize<LegalProcessEvent>(message.Data.ToStringUtf8());
+                var messageEvent = JsonSerializer.Deserialize<MessageEvent>(message.Data.ToStringUtf8());
+                var legalProcessEvent = JsonSerializer.Deserialize<LegalProcessEvent>(messageEvent!.Data);
 
                 if (legalProcessEvent is null)
                 {
@@ -53,6 +54,9 @@ public sealed class GooglePubSubSubscriberService : ISubscriberService
 
                     return SubscriberClient.Reply.Nack;
                 }
+
+                _logger.LogInformation("GooglePubSubSubscriberService - Message count deserialize: {message}",
+                    legalProcessEvent.ProcessCount);
 
                 var sendMessage = await SendMessageAsync(legalProcessEvent.ProcessCount);
 
