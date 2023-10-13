@@ -30,7 +30,7 @@ public class LegalProcessBuilder
 
     public LegalProcessBuilder ProcessPage(string serviceKey)
     {
-        _webDriver.FindElementByXPath($"//*[contains(text(),'{serviceKey}')]").Click();
+        _webDriver.FindElementsByXPath($"//*[contains(text(),'{serviceKey}')]").Last().Click();
         _webDriver.SwitchTo().Frame(_webDriver.FindElement(By.Name("userMainFrame")));
 
         return this;
@@ -74,7 +74,7 @@ public class LegalProcessBuilder
     public LegalProcessBuilder LogoffPage(string url)
     {
         _webDriver.Navigate().GoToUrl($"{url}/LogOn?PaginaAtual=-200");
-        
+
         return this;
     }
 
