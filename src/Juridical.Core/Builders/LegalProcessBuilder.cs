@@ -12,7 +12,10 @@ public class LegalProcessBuilder
 
     public LegalProcessBuilder(string uri)
     {
-        _webDriver = new RemoteWebDriver(new Uri(uri), new ChromeOptions());
+        var options = new ChromeOptions();
+        options.AddArguments("--no-sandbox", "--headless", "--disable-dev-shm-usage");
+
+        _webDriver = new RemoteWebDriver(new Uri(uri), options);
         _legalProcess = new LegalProcess();
     }
 
