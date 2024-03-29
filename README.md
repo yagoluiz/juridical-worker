@@ -85,7 +85,7 @@ python3 /root/bin/pubsub-client.py publish juridical-test juridical.legal-proces
 1) Run selenium:
 
 ```bash
-docker run -d -p 4444:4444 -p 7900:7900 --shm-size="2g" -e VNC_NO_PASSWORD=1 --name selenium selenium/standalone-chrome:110.0
+docker run -d -p 4444:4444 -p 7900:7900 --shm-size="2g" -e VNC_NO_PASSWORD=1 --name selenium selenium/standalone-chrome:123.0
 ```
 
 2) Run projects:
