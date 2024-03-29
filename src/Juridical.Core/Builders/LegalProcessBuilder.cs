@@ -12,10 +12,7 @@ public class LegalProcessBuilder
 
     public LegalProcessBuilder(string uri)
     {
-        var options = new ChromeOptions();
-        options.AddArgument("--headless");
-
-        _webDriver = new RemoteWebDriver(new Uri(uri), options);
+        _webDriver = new RemoteWebDriver(new Uri(uri), new ChromeOptions());
         _legalProcess = new LegalProcess();
     }
 
