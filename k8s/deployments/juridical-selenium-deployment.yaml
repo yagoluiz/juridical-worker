@@ -16,6 +16,9 @@ spec:
           image: selenium/standalone-chrome:123.0
           ports:
             - containerPort: 4444
+          env:
+            - name: JAVA_OPTS
+              value: '-Dwebdriver.chrome.whitelistedIps=""'
       restartPolicy: Always
   selector:
     matchLabels:

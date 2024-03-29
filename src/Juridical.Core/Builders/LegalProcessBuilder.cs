@@ -20,9 +20,14 @@ public class LegalProcessBuilder
 
     public LegalProcessBuilder LoginPage(string url, string user, string password)
     {
+        _webDriver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(1);
+
         _webDriver.Navigate().GoToUrl(url);
         _webDriver.FindElementById("login").SendKeys(user);
         _webDriver.FindElementById("senha").SendKeys(password);
+
+        _webDriver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(2);
+
         _webDriver.FindElementByName("entrar").Click();
 
         return this;
