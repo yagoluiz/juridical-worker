@@ -2,7 +2,7 @@
 
 [![juridical-worker-deploy](https://github.com/yagoluiz/juridical-worker/actions/workflows/juridical-worker-deploy.yaml/badge.svg)](https://github.com/yagoluiz/juridical-worker/actions/workflows/juridical-worker-deploy.yaml)
 
-Worker responsible for identify legal process.
+Worker responsible for web scraping and identifying legal processes from the **Projudi** system for the Justice Tribunal of Brazil.
 
 ## Environment settings local
 
