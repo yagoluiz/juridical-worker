@@ -22,7 +22,7 @@ public class LegalProcessBuilder
     {
         _webDriver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(1);
 
-        _webDriver.Navigate().GoToUrl(url);
+        _webDriver.Navigate().GoToUrl($"{url}/LogOn?PaginaAtual=-200");
         _webDriver.FindElementById("login").SendKeys(user);
         _webDriver.FindElementById("senha").SendKeys(password);
 
