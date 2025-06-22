@@ -18,7 +18,6 @@ resource "google_container_node_pool" "juridical-node-pool" {
   node_config {
     preemptible  = false
     machine_type = "e2-medium"
-    disk_size_gb = 10
 
     # Create manually: https://github.com/yagoluiz/juridical-worker#deploy (create service account)
     service_account = var.service_account
