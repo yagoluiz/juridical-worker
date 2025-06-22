@@ -42,7 +42,6 @@ jobs:
           terraform destroy \
             -var="project_id=${{ env.PROJECT_ID }}" \
             -var="service_account=${{ env.JURIDICAL_SERVICE_ACCOUNT }}" \
-            -auto-approve \
-            -lock=false
+            -auto-approve
         env:
           GOOGLE_CREDENTIALS: ${{ env.TERRAFORM_CREDENTIALS }}
