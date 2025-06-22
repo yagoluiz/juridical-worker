@@ -88,7 +88,8 @@ jobs:
           terraform apply \
             -var="project_id=${{ env.PROJECT_ID }}" \
             -var="service_account=${{ env.JURIDICAL_SERVICE_ACCOUNT }}" \
-            -auto-approve
+            -auto-approve \
+            -lock=false
         env:
           GOOGLE_CREDENTIALS: ${{ env.TERRAFORM_CREDENTIALS }}
 
